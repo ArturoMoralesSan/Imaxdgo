@@ -20,7 +20,7 @@ class ServiceController extends Controller
         abort_unless(Gate::allows('view.services') || Gate::allows('create.services'), 403);
         
         $search     = \Request('search');
-        $services = Service::with('branch','studies');
+        $services = Service::with('branch','studies')->orderBy('date','DESC');
         if (!Auth::user()->isSuperAdmin()) {
             $services = $services->where('branch_id', Auth::user()->branch_id);
         } 
@@ -41,7 +41,8 @@ class ServiceController extends Controller
             $branches = Branch::where('id', Auth::user()->branch_id)->pluck('name','id');
         } else {
             $branches = Branch::pluck('name','id');
-        }        $payments = Payment::pluck('name','id');
+        }        
+        $payments = Payment::pluck('name','id');
         $studies = Study::pluck('name','id');
         return view('admin.servicios.crear', compact('branches', 'studies', 'payments'));   
     }
