@@ -1,0 +1,28 @@
+<mjml>
+    <mj-head>
+        <mj-title>El registro fue exitoso</mj-title>
+        <mj-include path="./_styles.mjml" />
+    </mj-head>
+    <mj-body background-color="#fff">
+        <mj-include path="./_header.mjml" />
+
+        <mj-section background-color="#fcfcfc"
+            border-left="1px solid #f1f2f4"
+            border-bottom="1px solid #f1f2f4"
+            border-right="1px solid #f1f2f4"
+        >
+            <mj-column>
+                <mj-text>
+                    <p>
+                        Hola <strong>{{ $artists->full_name }}</strong>. <br>
+                        Tu información de registro ha sido guardada satisfactoriamente. <br>
+                        ¡Gracias por formar parte del Padrón Municipal de Agentes Culturales! <br>
+                        A través de este medio te informaremos de beneficios municipales creados para incentivar, reconocer y fomentar tu desarrollo.
+                    </p>
+                </mj-text>
+            </mj-column>
+        </mj-section>
+
+        <mj-include path="./_footer.mjml" />
+    </mj-body>
+</mjml>

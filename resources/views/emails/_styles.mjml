@@ -1,0 +1,44 @@
+<mj-attributes>
+    <mj-button
+        color="#fff"
+        font-size="15px"
+        font-family="sans-serif"
+        line-height="18px"
+    />
+
+    <mj-text
+        color="#6f7d8a"
+        font-size="15px"
+        font-family="sans-serif"
+        line-height="23px"
+    />
+
+    <mj-divider
+        border-color="#adb5bd"
+        border-style="dotted"
+        border-width="1px"
+        padding-bottom="0"
+        padding-top="0"
+    />
+</mj-attributes>
+<mj-style inline="inline">
+    p {
+        margin-bottom: 1.6em;
+    }
+
+    .link {
+        color: #39c;
+        text-decoration: none;
+    }
+
+    .underlined-link {
+        color: #39c;
+        text-decoration: underline;
+    }
+
+    .title {
+        color: #505963;
+        font-size: 16px;
+        text-align: center;
+    }
+</mj-style>

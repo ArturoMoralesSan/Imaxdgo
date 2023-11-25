@@ -1,0 +1,13 @@
+<mj-hero
+    mode="fixed-height"
+    height="140px"
+    background-color="#0ba5a7"
+    padding="15px 0 0"
+>
+    <mj-image src="{{ asset('img/logo-imac.png') }}"
+        alt="imac"
+        padding-bottom="0"
+        padding-top="0"
+        width="200px"
+    />
+</mj-hero>

@@ -1,0 +1,17 @@
+<mj-section>
+    <mj-column>
+        <mj-text
+            align="center"
+            font-size="13px"
+            line-height="20px"
+            padding-bottom="30px"
+            padding-top="0"
+        >
+            <strong>Instituto Municipal Del Arte Y Cultura.</strong><br>
+            Av 20 de Noviembre 407, Zona Centro, 34000 Durango, Dgo. <br>
+            (618) 827 1277 página web <a class="link" href="https://imac.gob.mx">imac.gob.mx</a>
+            <br>
+            Correo electrónico: <a class="link" href="mailto:imac@durangocapital.gob.mx">imac@durangocapital.gob.mx</a>
+        </mj-text>
+    </mj-column>
+</mj-section>

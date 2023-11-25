@@ -1,0 +1,105 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Auth;
+use Carbon\Carbon;
+use App\Models\Service;
+use App\Models\Expense;
+use App\Models\Study;
+use App\Models\Branch;
+
+class DashboardController extends Controller
+{
+    public function index()
+    {
+        $dateNow     = Carbon::now();
+        $dateFormat  = $dateNow->format('Y-m-d');
+        $date        = $dateNow->locale('es');
+        $string_date = $date->day.' ' .$date->monthName;
+        
+        $start_date = \Request('start_date') != null ? \Request('start_date') : $dateNow->subDays(5)->format('Y-m-d');
+        $end_date   = \Request('end_date') != null ? \Request('end_date') : $dateFormat ;
+
+        
+        if (!Auth::user()->isSuperAdmin()) {
+            $branches = Branch::with('services')->where('id',Auth::user()->branch_id)->whereHas('services', function($q) use ($start_date, $end_date){
+                $q->whereBetween('date', [$start_date, $end_date]);
+            })->get();
+            return view('admin.dashboard', compact('branches'));   
+
+        } else {
+            
+            $Servicesnow  = Service::where('date', $dateFormat);
+            $servicesCount = 0;
+            if($Servicesnow->get()->isEmpty()) {
+                $Servicesnow = 0;
+            } else {
+                $servicesCount = $Servicesnow->count();
+                foreach ($Servicesnow->get() as $service) {
+                    $Servicesnow =+ $service->cost;
+                }
+            }
+           
+
+            $ingreso = number_format(
+                $Servicesnow, 
+                2, '.', ',');
+                $gasto = number_format(
+                    Expense::where('date', $dateFormat)
+                    ->sum('amount'), 
+                    2, '.', ','
+            );
+            
+            $services  = Service::whereBetween('date', [$start_date, $end_date]);
+            $expensesCount = Expense::whereBetween('date', [$start_date, $end_date])->sum('amount');
+
+            $ordersAll = $services->count();
+            $CostbyServices = 0;
+            foreach ($services->get() as $service) {
+                $CostbyServices =+ $service->cost;
+            }
+
+            $days = $services->orderBy('date')
+            ->get()
+            ->groupBy(function ($val) {
+                $dateParse   = Carbon::parse($val->date);
+                $date        = $dateParse->locale('es');
+                return $date->day.' ' .$date->monthName;
+            })->map(function ($service) {
+                return $service->sum('cost');
+            });
+
+            $servicesPerPayments = [];
+            foreach ($services->get() as $service) {
+                foreach ($service->payments as $payment) {
+                    $paymentMethod = $payment->name;
+
+                    if (!isset($servicesPerPayments[$paymentMethod])) {
+                        $servicesPerPayments[$paymentMethod] = 0;
+                    }
+    
+                    $servicesPerPayments[$paymentMethod] += $payment->pivot->cost;
+                }
+            }
+            $servicesPerPayments = collect($servicesPerPayments);
+
+            
+            $studiesCount = Study::whereHas('services', function($q) use ($start_date, $end_date){
+                $q->whereBetween('date', [$start_date, $end_date]);
+            })
+            ->withCount('services')
+            ->orderBy('services_count', 'desc')
+            ->get();
+
+            $branches = Branch::with('services')->whereHas('services', function($q) use ($start_date, $end_date){
+                $q->whereBetween('date', [$start_date, $end_date]);
+            })->get();
+
+            return view('admin.dashboard-admin', compact('branches','studiesCount','servicesPerPayments','expensesCount','ordersAll', 'servicesCount', 'CostbyServices','string_date', 'ingreso', 'gasto', 'days'));   
+            
+        } 
+    }
+}
