@@ -9,6 +9,7 @@ use App\Models\Service;
 use App\Models\Expense;
 use Carbon\Carbon;
 use Auth;
+use Luecano\NumeroALetras\NumeroALetras;
 
 class PdfController extends Controller
 {
@@ -40,15 +41,13 @@ class PdfController extends Controller
         $dateFormat = $dateNow->format('Y-m-d');
         $service    = Service::find($id);
         
+        $formatter = new NumeroALetras();
+        $formatter->conector = 'Y';
+        $service->letter = $formatter->toMoney($service->cost, 2, 'pesos', 'centavos');
         
-        //$start_date = Carbon::createFromFormat('Y-m-d', $start_date)->format('d/m/Y');
-        //$end_date   = Carbon::createFromFormat('Y-m-d', $end_date)->format('d/m/Y');
+        $service->day = Carbon::createFromFormat('Y-m-d', $service->date)->format('d');
         $pdf = PDF::loadView('admin.pdf.note', compact('service'));
-
-        // Opcional: Personalizar configuración de Dompdf
         $pdf->setPaper('letter', 'portrait'); 
-               
-
         return $pdf->stream();
         //return $pdf->download('report.pdf');   
     }
