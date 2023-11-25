@@ -20,18 +20,22 @@ class DashboardController extends Controller
         $date        = $dateNow->locale('es');
         $string_date = $date->day.' ' .$date->monthName;
         
-        $start_date = \Request('start_date') != null ? \Request('start_date') : $dateNow->subDays(5)->format('Y-m-d');
-        $end_date   = \Request('end_date') != null ? \Request('end_date') : $dateFormat ;
-
         
         if (!Auth::user()->isSuperAdmin()) {
+            $start_date = \Request('start_date') != null ? \Request('start_date') : $dateFormat;
+            $end_date   = \Request('end_date') != null ? \Request('end_date') : $dateFormat ;
+
+        
             $branches = Branch::with('services')->where('id',Auth::user()->branch_id)->whereHas('services', function($q) use ($start_date, $end_date){
                 $q->whereBetween('date', [$start_date, $end_date]);
             })->get();
             return view('admin.dashboard', compact('branches'));   
 
         } else {
-            
+
+            $start_date = \Request('start_date') != null ? \Request('start_date') : $dateNow->subDays(5)->format('Y-m-d');
+            $end_date   = \Request('end_date') != null ? \Request('end_date') : $dateFormat ;
+
             $Servicesnow  = Service::where('date', $dateFormat);
             $servicesCount = 0;
             if($Servicesnow->get()->isEmpty()) {
