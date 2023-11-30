@@ -21,11 +21,6 @@ class PdfController extends Controller
 
         $start_date = \Request('start_date') != null ? \Request('start_date') : $dateNow->subDays(5)->format('Y-m-d');
         $end_date   = \Request('end_date') != null ? \Request('end_date') : $dateFormat ;
-
-        //Recuperar todos los productos de la db
-        $services = Service::whereBetween('date', [$start_date, $end_date])->orderBy('date')->where('branch_id', $id)->get();
-        $expenses = Expense::whereBetween('date', [$start_date, $end_date])->orderBy('date')->where('branch_id', $id)->with('type_expense')->get();
-        
         
         if (!Auth::user()->isSuperAdmin()) {
             $start_date = \Request('start_date') != null ? \Request('start_date') : $dateFormat;
@@ -33,6 +28,19 @@ class PdfController extends Controller
 
             $id = Auth::user()->branch_id;
         }
+        $services = Service::whereBetween('date', [$start_date, $end_date])
+        ->orderBy('date')
+        ->where('branch_id', $id)
+        ->get();
+
+        $expenses = Expense::whereBetween('date', [$start_date, $end_date])
+        ->orderBy('date')
+        ->where('branch_id', $id)
+        ->with('type_expense')
+        ->get();
+        
+        
+        
 
         $start_date = Carbon::createFromFormat('Y-m-d', $start_date)->format('d/m/Y');
         $end_date   = Carbon::createFromFormat('Y-m-d', $end_date)->format('d/m/Y');
