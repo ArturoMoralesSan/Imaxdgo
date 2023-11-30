@@ -3211,8 +3211,8 @@ __webpack_require__.r(__webpack_exports__);
     this.current_dateTime();
   },
   mounted: function mounted() {
-    if (this.ServiceData.length != 0) {
-      this.GetLastRX();
+    if (Object.keys(this.ServiceData).length != 0) {
+      this.fields.rx_prev = this.ServiceData.last_rx.toString();
     }
     if (this.assignedStudies.length != 0) {
       this.fields.studies_count = this.assignedStudies.length;
@@ -3234,15 +3234,19 @@ __webpack_require__.r(__webpack_exports__);
     },
     GetLastRX: function GetLastRX() {
       var _this = this;
-      window.axios.post(this.$root.path + '/admin/ultimo_rx/' + this.fields.branch_id).then(function (response) {
-        if (response.data != 0) {
-          _this.fields.rx_prev = response.data;
-          _this.inputdisabled = true;
-        } else {
-          _this.fields.rx_prev = '';
-          _this.inputdisabled = false;
-        }
-      });
+      if (Object.keys(this.ServiceData).length == 0) {
+        window.axios.post(this.$root.path + '/admin/ultimo_rx/' + this.fields.branch_id).then(function (response) {
+          if (response.data != 0) {
+            _this.fields.rx_prev = response.data;
+            _this.inputdisabled = true;
+          } else {
+            _this.fields.rx_prev = '';
+            _this.inputdisabled = false;
+          }
+        });
+      } else {
+        this.fields.rx_prev = this.ServiceData.last_rx.toString();
+      }
     },
     current_dateTime: function current_dateTime() {
       var today = new Date();

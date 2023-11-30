@@ -2,7 +2,7 @@
 return [
 
     'css' => [
-        'dashboard' => 1,
+        'dashboard' => 2,
         'main'      => 1
     ],
 
