@@ -52,7 +52,7 @@
                                 @{{ branchItem.count_services }}
                             </td>
                             <td data-label="Monto:">
-                                @{{ branchItem.amount_services }}
+                                $@{{ branchItem.amount_services }}
                             </td>
                             <td data-label="Reporte:">
                                 <link-pdf 
