@@ -19,14 +19,16 @@ class DashboardController extends Controller
         $dateFormat  = $dateNow->format('Y-m-d');
         $date        = $dateNow->locale('es');
         $string_date = $date->day.' ' .$date->monthName;
-        
+        $ServicesAmount = 0;
         
         if (!Auth::user()->isSuperAdmin()) {
             $start_date = \Request('start_date') != null ? \Request('start_date') : $dateFormat;
             $end_date   = \Request('end_date') != null ? \Request('end_date') : $dateFormat ;
 
         
-            $branches = Branch::with('services')->where('id',Auth::user()->branch_id)->whereHas('services', function($q) use ($start_date, $end_date){
+            $branches = Branch::with(['services' => function($q) use ($start_date, $end_date) {
+                $q->whereBetween('date', [$start_date, $end_date]);
+            }])->where('id',Auth::user()->branch_id)->whereHas('services', function($q) use ($start_date, $end_date){
                 $q->whereBetween('date', [$start_date, $end_date]);
             })->get();
             return view('admin.dashboard', compact('branches'));   
@@ -42,14 +44,14 @@ class DashboardController extends Controller
                 $Servicesnow = 0;
             } else {
                 $servicesCount = $Servicesnow->count();
+                
                 foreach ($Servicesnow->get() as $service) {
-                    $Servicesnow =+ $service->cost;
+                    $ServicesAmount =+ $ServicesAmount + $service->cost;
                 }
-            }
-           
+            }           
 
             $ingreso = number_format(
-                $Servicesnow, 
+                $ServicesAmount, 
                 2, '.', ',');
                 $gasto = number_format(
                     Expense::where('date', $dateFormat)
@@ -63,7 +65,7 @@ class DashboardController extends Controller
             $ordersAll = $services->count();
             $CostbyServices = 0;
             foreach ($services->get() as $service) {
-                $CostbyServices =+ $service->cost;
+                $CostbyServices =+ $CostbyServices + $service->cost;
             }
 
             $days = $services->orderBy('date')
@@ -98,7 +100,9 @@ class DashboardController extends Controller
             ->orderBy('services_count', 'desc')
             ->get();
 
-            $branches = Branch::with('services')->whereHas('services', function($q) use ($start_date, $end_date){
+            $branches = Branch::with(['services' => function($q) use ($start_date, $end_date) {
+                $q->whereBetween('date', [$start_date, $end_date]);
+            }])->whereHas('services', function($q) use ($start_date, $end_date){
                 $q->whereBetween('date', [$start_date, $end_date]);
             })->get();
 
