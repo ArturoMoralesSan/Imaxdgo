@@ -19,14 +19,14 @@
 
         .container-folio {
             position: absolute;
-            top: 42px; /* Posición superior */
-            right: 120px; /* Posición izquierda */
+            top: 35px; /* Posición superior */
+            right: 95px; /* Posición izquierda */
             
         }
         .date {
             position: absolute;
-            top: 75px; /* Posición superior */
-            right: 50px; /* Posición izquierda */
+            top: 65px; /* Posición superior */
+            right: 59px; /* Posición izquierda */
             
         }
         .year {
@@ -41,13 +41,13 @@
 
         .container-patient {
             position: absolute;
-            top: 118px; /* Posición superior */
-            left: 100px; /* Posición izquierda */
+            top: 110px; /* Posición superior */
+            left: 70px; /* Posición izquierda */
         }
         .container-service {
             position: absolute;
             top: 190px; /* Posición superior */
-            left: 70px;
+            left: 40px;
             right:0;
             font-size:20px;
         }
@@ -55,7 +55,7 @@
         .service-qty {
             display: inline-block;
             position absolute;
-            margin-right:60px;
+            margin-right:70px;
             
         }
 
@@ -78,8 +78,8 @@
 
         .container-letter {
             position: absolute;
-            bottom: 40px; /* Posición superior */
-            left: 45px;
+            bottom: 32px; /* Posición superior */
+            left: 20px;
             right:0;
             font-size:15px;
             
@@ -87,17 +87,25 @@
 
         .letter-cost {
             display: inline-block;
-            width: 440px;
+            width: 330px;
             margin-right:105px;
         }
         .container-total {
             display: inline-block;
+            position: relative;
         }
 
-        .total-total {
-            margin-top:20px;
-            margin-bottom:-20px;
+        .total-subtotal {
+            position:absolute;
+            top: -35px;
+            left:90px; 
         }
+        .total-total {
+            position:absolute;
+            top:10px;
+            left:90px; 
+        }
+        
 
         
     </style>
