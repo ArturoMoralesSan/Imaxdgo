@@ -40,7 +40,7 @@
                 </p>
             @else
 
-                <resource-table :breakpoint="800" :model="{{ $services }}" inline-template>
+                <resource-table :breakpoint="800" :model="{{ $servicesItems }}" inline-template>
                     <table class="table size-caption mx-auto mb-16 md:table--responsive">
                         <thead>
                             <tr class="table-resource__headings">
@@ -104,6 +104,9 @@
                     </table>
 
                 </resource-table>
+
+                {{ $services->links('layout.pagination')}}
+                
 
             @endif
 

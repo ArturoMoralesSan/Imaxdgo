@@ -23,8 +23,9 @@ class ExpenseController extends Controller
         if (!Auth::user()->isSuperAdmin()) {
             $expenses = $expenses->where('branch_id', Auth::user()->branch_id);
         } 
-        $expenses = $expenses->get();
-        return view('admin.gastos.index', compact('expenses'));   
+        $expenses = $expenses->paginate(50);
+        $expensesItems = Collect($expenses->items());
+        return view('admin.gastos.index', compact('expenses', 'expensesItems'));   
     }
 
     public function create()
