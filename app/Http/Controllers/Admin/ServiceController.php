@@ -29,9 +29,10 @@ class ServiceController extends Controller
             $services = $services->where('patient', 'LIKE', '%'.$search.'%');
         }
 
-        $services = $services->get();
+        $services = $services->paginate(50);
+        $servicesItems = Collect($services->items());
 
-        return view('admin.servicios.index', compact('services')); 
+        return view('admin.servicios.index', compact('services', 'servicesItems')); 
     }
 
     public function create()
@@ -79,6 +80,12 @@ class ServiceController extends Controller
             $date = Carbon::createFromFormat('Y-m-d', $service->date);
 
         }
+
+        if($request->print == 'No') {
+            $no_rx = 0;
+        } else {
+            $no_rx = $request->no_rx;
+        }
         
         $service->patient = $request->patient;
         $service->last_rx = $request->rx_prev;
@@ -87,7 +94,7 @@ class ServiceController extends Controller
         $service->month = $date->month;
         $service->week = $date->week;
         $service->print = $request->print;
-        $service->no_rx = $request->no_rx;
+        $service->no_rx = $no_rx;
         $service->save();
 
         $service->studies()->detach();
@@ -115,10 +122,13 @@ class ServiceController extends Controller
     public function getrx(Request $request, $id)
     {
         $last_service = Service::where('branch_id',$id)
-        ->orderBy('last_rx', 'asc')
+        ->orderBy('id', 'DESC')
         ->first();
         if ($last_service) {
             $last_rx = $last_service->last_rx - $last_service->no_rx;
+            if ($last_rx < 0) {
+                $last_rx = 0;
+            }
             return response()->json($last_rx);
         } else {
             return response()->json(0);

@@ -30,7 +30,7 @@
                 </p>
             @else
 
-                <resource-table :breakpoint="800" :model="{{ $expenses }}" inline-template>
+                <resource-table :breakpoint="800" :model="{{ $expensesItems }}" inline-template>
                     <table class="table size-caption mx-auto mb-16 md:table--responsive">
                         <thead>
                             <tr class="table-resource__headings">
@@ -79,7 +79,7 @@
                     </table>
 
                 </resource-table>
-
+                {{ $expenses->links('layout.pagination') }}
             @endif
 
         </section>
