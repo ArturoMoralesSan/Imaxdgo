@@ -215,8 +215,8 @@
             this.current_dateTime();
         },
         mounted() {
-            if(this.ServiceData.length != 0) {
-                this.GetLastRX();
+            if(Object.keys(this.ServiceData).length != 0) {
+                this.fields.rx_prev = this.ServiceData.last_rx.toString();
             }
             
             if (this.assignedStudies.length != 0) {
@@ -241,18 +241,23 @@
             },
 
             GetLastRX() {
-                window.axios.post(this.$root.path + '/admin/ultimo_rx/' +this.fields.branch_id)
-                .then(response => {
-                    if (response.data != 0) {
-                        this.fields.rx_prev = response.data;
-                        this.inputdisabled = true;
-                    } else {
-                        this.fields.rx_prev = '';
-                        this.inputdisabled = false;
+                if(Object.keys(this.ServiceData).length == 0) { 
+                    window.axios.post(this.$root.path + '/admin/ultimo_rx/' +this.fields.branch_id)
+                    .then(response => {
+                        if (response.data != 0) {
+                            this.fields.rx_prev = response.data;
+                            this.inputdisabled = true;
+                        } else {
+                            this.fields.rx_prev = '';
+                            this.inputdisabled = false;
 
-                    }
-                        
-                });
+                        }
+                            
+                    });
+                } else {
+                    this.fields.rx_prev = this.ServiceData.last_rx.toString();
+                }
+                
             },
 
             current_dateTime: function () {
