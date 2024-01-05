@@ -33,22 +33,22 @@
     <div class="fluid-container mb-16">
         @include('components.alert')
         <section class="db-panel">
-            <div class="md:row">
-                <div class="md:col-1/4">
+            <div class="row">
+                <div class="column-statistics">
                    <strong>
                     Hoy <br>
                     {{ $string_date }}
                    </strong> 
                 </div>
-                <div class="md:col-1/4">
+                <div class="column-statistics">
                     <strong>${{ $ingreso }}</strong> <br>
                     Ingresos
                 </div>
-                <div class="md:col-1/4">
+                <div class="column-statistics mb-0">
                     <strong>${{ $gasto }}</strong> <br>
                     Gastos
                 </div>
-                <div class="md:col-1/4">
+                <div class="column-statistics mb-0">
                     <strong>{{ $servicesCount }}</strong> <br>
                     Órdenes
                 </div>
@@ -58,19 +58,19 @@
             <h3 class="db-panel__title">
                 Ingresos
             </h3>
-            <canvas id="canvas" height="100"></canvas>
+            <canvas id="canvas" class="graph-statistics-income"></canvas>
         </section>
         <section class="db-panel">
-            <div class="md:row">
-                <div class="md:col-1/3">
+            <div class="row">
+                <div class="column-statistics-1-3 ">
                     <strong>${{ $CostbyServices }}</strong> <br>
                     Ingresos
                 </div>
-                <div class="md:col-1/3">
+                <div class="column-statistics-1-3 ">
                     <strong>${{ $expensesCount }}</strong> <br>
                     Gastos
                 </div>
-                <div class="md:col-1/3">
+                <div class="column-statistics-1-3 mb-0">
                     <strong> {{ $ordersAll }}</strong> <br>
                     Órdenes
                 </div>
@@ -82,7 +82,7 @@
                     <h3 class="db-panel__title">
                         Metodos de pago
                     </h3>
-                    <canvas id="canvaspayments" height="90"></canvas>
+                    <canvas id="canvaspayments" class="graph-statistics-pay"></canvas>
                 </section>
             </div>
             <div class="md:col-1/2">
@@ -196,9 +196,7 @@
                 type: 'line',
                 data: lineChartData,
                 options: {
-                
-                    responsive: true,
-                    title: {
+                    responsive: true,                    title: {
                         display: true,
                         text: 'Total de Ingresos'
                     }

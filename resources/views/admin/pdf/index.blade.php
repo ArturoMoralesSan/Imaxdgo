@@ -65,8 +65,16 @@
                     <tbody>
                         @foreach ($expenses as $expense)
                         <tr>
-                            <th scope="row">{{ $expense->type_expense->name }}</th>
-                            <td>${{ $expense->amount }}</td>
+                            <th scope="row">
+                                @if($expense->type_expense->key_name == 'comisiones')
+                                    {{ $expense->type_expense->name }} ({{ $expense->person_name }})
+                                @else
+                                    {{ $expense->type_expense->name }}
+                                @endif
+                            </th>
+                            <td>
+                                ${{ $expense->amount }}
+                            </td>
                         </tr>
                         @endforeach
                     </tbody>

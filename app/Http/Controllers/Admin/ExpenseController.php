@@ -19,7 +19,7 @@ class ExpenseController extends Controller
     {
         abort_unless(Gate::allows('view.expenses') || Gate::allows('create.expenses'), 403);
         
-        $expenses = Expense::with('branch','type_expense');
+        $expenses = Expense::with('branch','type_expense')->orderBy('id', 'DESC');
         if (!Auth::user()->isSuperAdmin()) {
             $expenses = $expenses->where('branch_id', Auth::user()->branch_id);
         } 
