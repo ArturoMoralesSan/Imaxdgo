@@ -20,7 +20,7 @@
         .container-folio {
             position: absolute;
             top: 35px; /* Posición superior */
-            right: 95px; /* Posición izquierda */
+            right: 75px; /* Posición izquierda */
             
         }
         .date {
@@ -112,7 +112,13 @@
 </head>
 <body>
     <div class="container-folio">
-        <span class="folio"> {{ $service->id }}</span>
+        <span class="folio">
+            @if($service->folio == null)
+                {{ $service->id }}
+            @else
+                {{ $service->folio }}
+            @endif
+        </span>
     </div>
     <div class="date">
         <span class="day">

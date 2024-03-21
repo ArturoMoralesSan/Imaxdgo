@@ -56,7 +56,8 @@
                             </td>
                             <td data-label="Reporte:">
                                 <link-pdf 
-                                    :branchid="branchItem.id" 
+                                    :branchid="branchItem.id"
+                                    url="/admin/pdf/"
                                     startdate="{{ app('request')->input('start_date') }}"
                                     enddate="{{ app('request')->input('end_date') }}">
                                 </link-pdf>                                    

@@ -8,9 +8,10 @@ use Auth;
 use Carbon\Carbon;
 use App\Models\Service;
 use App\Models\Expense;
+use App\Models\TypeExpense;
 use App\Models\Study;
 use App\Models\Branch;
-
+use DB;
 class DashboardController extends Controller
 {
     public function index()
@@ -38,7 +39,7 @@ class DashboardController extends Controller
             $start_date = \Request('start_date') != null ? \Request('start_date') : $dateNow->subDays(5)->format('Y-m-d');
             $end_date   = \Request('end_date') != null ? \Request('end_date') : $dateFormat ;
 
-            $Servicesnow  = Service::where('date', $dateFormat);
+            $Servicesnow   = Service::where('date', $dateFormat);
             $servicesCount = 0;
             if($Servicesnow->get()->isEmpty()) {
                 $Servicesnow = 0;
@@ -91,14 +92,34 @@ class DashboardController extends Controller
                 }
             }
             $servicesPerPayments = collect($servicesPerPayments);
-
+            
             
             $studiesCount = Study::whereHas('services', function($q) use ($start_date, $end_date){
                 $q->whereBetween('date', [$start_date, $end_date]);
             })
-            ->withCount('services')
+            ->withCount([
+                'services', 
+                'services as services_count' => function ($query) use ($start_date, $end_date) {
+                    $query->whereBetween('date', [$start_date, $end_date]);
+                }])
             ->orderBy('services_count', 'desc')
             ->get();
+
+
+
+            $expensesByType = TypeExpense::join('expenses', 'expenses.type_expense_id', '=', 'type_expenses.id')
+                ->whereBetween('expenses.date', [$start_date, $end_date])
+                ->groupBy('type_expenses.id')
+                ->select('type_expenses.*', DB::raw('SUM(expenses.amount) as expenses_sum_amount'))
+                ->orderBy('expenses_sum_amount', 'desc')
+                ->get();
+            
+            
+            $expensesByType->transform(function ($type) {
+                $type->expenses_sum_amount = number_format($type->expenses_sum_amount, 2, '.', ',');
+                return $type;
+            });
+        
 
             $branches = Branch::with(['services' => function($q) use ($start_date, $end_date) {
                 $q->whereBetween('date', [$start_date, $end_date]);
@@ -106,7 +127,14 @@ class DashboardController extends Controller
                 $q->whereBetween('date', [$start_date, $end_date]);
             })->get();
 
-            return view('admin.dashboard-admin', compact('branches','studiesCount','servicesPerPayments','expensesCount','ordersAll', 'servicesCount', 'CostbyServices','string_date', 'ingreso', 'gasto', 'days'));   
+            
+            $branchesExpenses = Branch::with(['expenses' => function($q) use ($start_date, $end_date) {
+                $q->whereBetween('date', [$start_date, $end_date]);
+            }])->whereHas('expenses', function($q) use ($start_date, $end_date){
+                $q->whereBetween('date', [$start_date, $end_date]);
+            })->get();
+
+            return view('admin.dashboard-admin', compact('branches','studiesCount','servicesPerPayments','expensesCount','ordersAll', 'servicesCount', 'CostbyServices','string_date', 'ingreso', 'gasto', 'days', 'branchesExpenses', 'expensesByType'));   
             
         } 
     }

@@ -63,11 +63,11 @@
         <section class="db-panel">
             <div class="row">
                 <div class="column-statistics-1-3 ">
-                    <strong>${{ $CostbyServices }}</strong> <br>
+                    <strong>${{ number_format($CostbyServices, 2, '.') }}</strong> <br>
                     Ingresos
                 </div>
                 <div class="column-statistics-1-3 ">
-                    <strong>${{ $expensesCount }}</strong> <br>
+                    <strong>${{ number_format($expensesCount, 2, ".") }}</strong> <br>
                     Gastos
                 </div>
                 <div class="column-statistics-1-3 mb-0">
@@ -77,7 +77,7 @@
             </div>
         </section>
         <div class="md:row">
-            <div class="md:col-1/2">
+            <div class="md:col-1/3">
                 <section class="db-panel">
                     <h3 class="db-panel__title">
                         Metodos de pago
@@ -85,7 +85,7 @@
                     <canvas id="canvaspayments" class="graph-statistics-pay"></canvas>
                 </section>
             </div>
-            <div class="md:col-1/2">
+            <div class="md:col-1/3">
                 <section class="db-panel">
                     <h3 class="db-panel__title">
                         Ingresos por sucursal
@@ -116,10 +116,56 @@
                                     <td data-label="Reporte:">
                                         <link-pdf 
                                             :branchid="branchItem.id" 
+                                            url="/admin/pdf/"
+                                            startdate="{{ app('request')->input('start_date') }}"
+                                            enddate="{{ app('request')->input('end_date') }}">
+                                        </link-pdf>                                   
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </resource-table>
+                </section>
+                
+            </div>
+            <div class="md:col-1/3">
+            <section class="db-panel">
+                    <h3 class="db-panel__title">
+                        Egresos por sucursal
+                    </h3>
+                    <resource-table :breakpoint="800" :model="{{ $branchesExpenses }}" inline-template>
+
+                        <table class="table size-caption mx-auto md:table--responsive">
+                            <thead>
+                                <tr class="table-resource__headings">
+                                    <th>Sucursal</th>
+                                    <th>Gasto</th>
+                                    <th>Reporte</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr v-for="branchItem in resourceList" class="table-resource__row" :key="branchItem.id">
+                                    <td data-label="Estudio:">
+                                        @{{ branchItem.name }}
+                                    </td>
+                                    <td data-label="Monto:">
+                                        $@{{ branchItem.amount_expenses }}
+                                    </td>
+                                    <td data-label="Reporte:">
+                                        <link-pdf 
+                                            :branchid="branchItem.id" 
+                                            url="/admin/pdf-egreso/"
                                             startdate="{{ app('request')->input('start_date') }}"
                                             enddate="{{ app('request')->input('end_date') }}">
                                         </link-pdf>                                    
                                     </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>TOTAL</strong></td>
+                                    <td><strong>${{ number_format($branchesExpenses->sum('amount_expenses_raw'), 2, ".") }}</strong></td>
+                                    <td></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -129,7 +175,7 @@
             </div>
         </div>
         <div class="md:row">
-            <div class="md:col-2/3">
+            <div class="md:col-1/2">
                 <section class="db-panel">
                     <h3 class="db-panel__title">
                         Estudios más populares
@@ -141,7 +187,6 @@
                                 <tr class="table-resource__headings">
                                     <th>Estudio</th>
                                     <th>cantidad</th>
-                                    
                                 </tr>
                             </thead>
 
@@ -152,6 +197,47 @@
                                     </td>
                                     <td data-label="Cantidad:">
                                         @{{ studyItem.services_count }}
+                                    </td>
+                                    
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </resource-table>
+                </section>
+            </div>
+            <div class="md:col-1/2">
+                <section class="db-panel">
+                    <h3 class="db-panel__title">
+                        Gastos más populares
+                    </h3>
+                    <resource-table :breakpoint="800" :model="{{ $expensesByType }}" inline-template>
+
+                        <table class="table size-caption mx-auto md:table--responsive">
+                            <thead>
+                                <tr class="table-resource__headings">
+                                    <th>Gasto</th>
+                                    <th>Monto</th>
+                                    <th>Reporte</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr v-for="expenseItem in resourceList" class="table-resource__row" :key="expenseItem.id">
+                                    <td data-label="Gasto:">
+                                        
+                                        @{{ expenseItem.name }}
+                                    </td>
+                                    <td data-label="Cantidad:">
+                                        $ @{{ expenseItem.expenses_sum_amount }}
+                                    </td>
+                                    <td data-label="Reporte:">
+                                    <link-pdf 
+                                            :branchid="expenseItem.id" 
+                                            url="/admin/pdf-gasto/"
+                                            startdate="{{ app('request')->input('start_date') }}"
+                                            enddate="{{ app('request')->input('end_date') }}">
+                                        </link-pdf>
                                     </td>
                             
                                 </tr>

@@ -20,16 +20,14 @@ class ServiceController extends Controller
         abort_unless(Gate::allows('view.services') || Gate::allows('create.services'), 403);
         
         $search     = \Request('search');
-        $services = Service::with('branch','studies')->orderBy('date','DESC');
+        $services = Service::with('branch','studies')->orderBy('date','DESC')->paginate(20);
         if (!Auth::user()->isSuperAdmin()) {
-            $services = $services->where('branch_id', Auth::user()->branch_id);
+            $services = Service::with('branch','studies')->orderBy('date','DESC')->where('branch_id', Auth::user()->branch_id)->paginate(20);
         } 
         
         if($search) {
             $services = $services->where('patient', 'LIKE', '%'.$search.'%');
         }
-
-        $services = $services->paginate(50);
         $servicesItems = Collect($services->items());
 
         return view('admin.servicios.index', compact('services', 'servicesItems')); 
@@ -74,11 +72,29 @@ class ServiceController extends Controller
             $date = Carbon::createFromFormat('Y-m-d', $request->date);
             $service->date = $request->date;
 
+            $last_service = Service::where('branch_id', $request->branch_id)
+            ->orderBy('id','DESC')
+            ->first();
 
+            if ($last_service->folio == null) {
+                $number_next = 0;
+                
+            } else {
+                $number_next = intval(substr($last_service->folio, 1));
+            }
+
+            $number_next = $number_next + 1;
+
+            $branch_name = Branch::find($request->branch_id)->name;
+            $first_char = mb_substr($branch_name, 0, 1);
+
+            $prev_folio = str_pad($first_char, 6, '0', STR_PAD_RIGHT);
+            $folio      = str_pad($prev_folio, 7, $number_next, STR_PAD_RIGHT);
+            
         } else {
             $service = Service::find($request->service_id);
-            $date = Carbon::createFromFormat('Y-m-d', $service->date);
-
+            $date    = Carbon::createFromFormat('Y-m-d', $service->date);
+            $folio   = $service->folio;
         }
 
         if($request->print == 'No') {
@@ -86,7 +102,7 @@ class ServiceController extends Controller
         } else {
             $no_rx = $request->no_rx;
         }
-        
+        $service->folio = $folio;
         $service->patient = $request->patient;
         $service->last_rx = $request->rx_prev;
         $service->branch_id = $request->branch_id;

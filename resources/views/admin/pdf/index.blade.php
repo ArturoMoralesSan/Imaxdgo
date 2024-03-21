@@ -33,7 +33,7 @@
                             <th scope="row">{{ $service->id }}</th>
                             <td>{{ $service->patient }}</td>
                             <td>{{ $service->list_studies }}</td>
-                            <td>${{ $service->cost }}</td>
+                            <td>${{ number_format($service->cost, 2, ".") }}</td>
                             <td>{{ $service->print }}</td>
                             <td>{{ $service->no_rx }}</td>
                         </tr>
@@ -44,7 +44,7 @@
                             <td></td>
                             <td></td>
                             <td>Total</td>
-                            <th>${{ $services->sum('cost')}}</th>
+                            <th>${{ number_format($services->sum('cost'), 2, ".") }}</th>
                             <th>-</th>
                             <th>{{ $services->sum('no_rx')}}</th>
                         </tr>
@@ -73,7 +73,7 @@
                                 @endif
                             </th>
                             <td>
-                                ${{ $expense->amount }}
+                                ${{ number_format($expense->amount, 2, ".") }}
                             </td>
                         </tr>
                         @endforeach
@@ -81,7 +81,7 @@
                     <tfoot>
                         <tr>
                             <td>Total</td>
-                            <th>${{ $expenses->sum('amount')}}</th>
+                            <th>${{ number_format($expenses->sum('amount'), 2, ".") }}</th>
                         </tr>
                     </tfoot>
                 </table>
@@ -95,11 +95,55 @@
                     </thead>
                     <tbody>
                         <td>
-                            ${{ $services->sum('cost') -  $expenses->sum('amount') }}
+                            ${{ number_format($services->sum('cost') -  $expenses->sum('amount'), 2, ".") }}
                         </td>
                     </tbody>
                 </table>
             </div>
+        </div>
+        <div class="row">
+            <table class="table table-bordered">
+                <caption>Lista de ingresos por método de pago</caption>
+                <thead>
+                    <tr>
+                    <th scope="col">Tipo de pago</th>
+                    <th scope="col">Monto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($servicesPerPayments as $key => $payment)
+                    <tr>
+                        <th scope="row">
+                            {{ $key }}
+                        </th>
+                        <td>
+                            ${{ number_format($payment, 2, ".") }}
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td>Subtotal</td>
+                        <th>${{ number_format($servicesPerPayments->sum(), 2, ".") }}</th>
+                    </tr>
+                    <tr>
+                        <td>Gastos</td>
+                        <th>${{ number_format($expenses->sum('amount'), 2, ".") }}</th>
+                    </tr>
+                    @foreach ($serviceswithinCash as $key => $payment)
+                        <tr>
+                            <td>{{ $key }}</td>
+                            <th>${{ number_format($payment, 2, ".") }}</th>
+                        </tr>
+                    @endforeach
+                    <tr>
+                        <td>Total</td>
+                        <th>${{ number_format($servicesPerPayments->sum() - $expenses->sum('amount') - $serviceswithinCash->sum(), 2, ".") }}</th>
+                    </tr>
+                </tfoot>
+
+            </table>
         </div>
     </div>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>

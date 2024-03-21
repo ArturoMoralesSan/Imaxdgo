@@ -1,5 +1,5 @@
 <template>
-    <a :href="$root.path + '/admin/pdf/' + branchid + 
+    <a target="_blank" :href="$root.path + url + branchid + 
         '?start_date=' + startdate + '&end_date=' + enddate">
         PDF
     </a>
@@ -19,6 +19,10 @@
                 type:String,
                 required: true
             },
+            url : {
+                type: String,
+                required:true
+            }
         },
     };
 </script>
