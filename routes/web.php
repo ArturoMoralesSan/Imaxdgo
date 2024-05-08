@@ -16,6 +16,9 @@ use App\Http\Controllers\Admin\StatisticsController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Admin\PdfController;
+use App\Http\Controllers\Admin\RaceController;
+use App\Http\Controllers\Admin\RaceRegistrationController;
+
 
 use Illuminate\Support\Facades\Auth;
 
@@ -140,6 +143,21 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], functio
     Route::view('cambiar-contrasena', 'principal.cambiar-contrasena');
     Route::post('cambiar-contrasena', 'Auth\PasswordController@update');
 
-    
+    //Carreras
+    Route::get('carreras', [RaceController::class, 'index']);
+    Route::view('carreras/crear', 'admin.carreras.crear');
+    Route::post('carreras/crear', [RaceController::class, 'save']);
+    Route::get('carreras/{id}/editar', [RaceController::class, 'edit']);
+    Route::put('carreras/{id}/actualizar', [RaceController::class, 'update']);
+    Route::delete('carreras/eliminar/{id}', [RaceController::class, 'delete']);
+
+    //Participantes
+    Route::get('carrera-participantes', [RaceRegistrationController::class, 'index']);
+    Route::get('carrera-participantes/crear', [RaceRegistrationController::class, 'create']);
+    Route::post('carrera-participantes/crear', [RaceRegistrationController::class, 'save']);
+    Route::get('carrera-participantes/{id}/editar', [RaceRegistrationController::class, 'edit']);
+    Route::put('carrera-participantes/{id}/actualizar', [RaceRegistrationController::class, 'update']);
+    Route::delete('carrera-participantes/eliminar/{id}', [RaceRegistrationController::class, 'delete']);
+
 
 });
