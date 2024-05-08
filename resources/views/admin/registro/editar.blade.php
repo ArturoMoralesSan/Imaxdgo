@@ -35,7 +35,7 @@
                         </h3>
 
                         <div class="md:row mb-4">
-                            <div class="col">
+                            <div class="col-1/2">
                                 {{-- nombres --}}
                                 <div class="form-control">
                                     <label for="race_id">Carrera</label>
@@ -44,6 +44,20 @@
                                         v-model="fields.race_id" 
                                         :options="{{ $races }}"
                                         initial="{{ $register->race_id }}"
+                                    >
+                                    </select-field>
+                                    <field-errors name="race_id"></field-errors>
+                                </div>
+                            </div>
+                            <div class="col-1/2">
+                                {{-- nombres --}}
+                                <div class="form-control">
+                                    <label for="branch_id">Sucursal</label>
+                                    <select-field 
+                                        name="branch_id" 
+                                        v-model="fields.branch_id" 
+                                        :options="{{ $branches }}"
+                                        initial="{{ $register->branch_id }}"
                                     >
                                     </select-field>
                                     <field-errors name="race_id"></field-errors>
