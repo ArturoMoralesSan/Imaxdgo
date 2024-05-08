@@ -14,13 +14,41 @@ use Auth;
 
 class RaceRegistrationController extends Controller
 {
+    public function statics()
+    {
+        abort_unless(Gate::allows('view.races') || Gate::allows('create.races'), 403);
+        if (!Auth::user()->isSuperAdmin()) {
+            $registers = RaceRegistration::with('branch','race')->orderBy('created_at','DESC')->where('branch_id', Auth::user()->branch_id);
+        } else {
+            $registers = RaceRegistration::with('branch','race')->orderBy('created_at','DESC');
+        }
+        $amountByRegisters = $registers->sum('cost');
+        $ordersAll = $registers->count();
+
+        $totalPerType = $registers->get()
+        ->groupBy('type')->map(function ($register) {
+            return $register->count();
+        });
+
+        $totalPerSize = $registers->get()
+        ->groupBy('size')->map(function ($register) {
+            return $register->count();
+        });
+        $totalPerSex = $registers->get()
+        ->groupBy('sex')->map(function ($register) {
+            return $register->count();
+        });
+
+
+        return view('admin.estadisticas.carrera', compact('ordersAll', 'amountByRegisters', 'totalPerType', 'totalPerSize', 'totalPerSex'));   
+    }
     public function index()
     {
         abort_unless(Gate::allows('view.races') || Gate::allows('create.races'), 403);
         if (!Auth::user()->isSuperAdmin()) {
-            $registers = RaceRegistration::orderBy('created_at','DESC')->where('branch_id', Auth::user()->branch_id)->paginate(20);
+            $registers = RaceRegistration::with('branch','race')->orderBy('created_at','DESC')->where('branch_id', Auth::user()->branch_id)->paginate(20);
         } else {
-            $registers = RaceRegistration::orderBy('created_at','DESC')->paginate(20);
+            $registers = RaceRegistration::with('branch','race')->orderBy('created_at','DESC')->paginate(20);
         } 
 
         $registersItems = Collect($registers->items());
