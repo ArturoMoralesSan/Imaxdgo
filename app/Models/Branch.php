@@ -47,4 +47,9 @@ class Branch extends Model
     {
         return $this->hasMany(Expense::class);
     }
+
+    public function registers()
+    {
+        return $this->hasMany(RaceRegistration::class);
+    }
 }

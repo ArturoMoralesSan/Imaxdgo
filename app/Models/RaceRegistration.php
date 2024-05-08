@@ -15,4 +15,15 @@ class RaceRegistration extends Model
         return number_format($this->cost, 2);
     }
 
+    
+
+    public function race()
+    {
+        return $this->belongsTo(Race::class);
+    }
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
 }
