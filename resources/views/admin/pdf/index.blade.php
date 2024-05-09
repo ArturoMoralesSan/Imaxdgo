@@ -19,11 +19,13 @@
                     <thead>
                       <tr>
                         <th scope="col">ID</th>
+                        <th scope="col">Hora</th>
                         <th scope="col">Paciente</th>
                         <th scope="col">Estudios</th>
                         <th scope="col">costo</th>
                         <th scope="col">Impresa</th>
                         <th scope="col">N° RX</th>
+                        
 
                       </tr>
                     </thead>
@@ -31,6 +33,7 @@
                         @foreach ($services as $service)
                         <tr>
                             <th scope="row">{{ $service->id }}</th>
+                            <td>{{ $service->hour }}</td>
                             <td>{{ $service->patient }}</td>
                             <td>{{ $service->list_studies }}</td>
                             <td>${{ number_format($service->cost, 2, ".") }}</td>
@@ -41,9 +44,8 @@
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td></td>
-                            <td></td>
-                            <td>Total</td>
+                            
+                            <td colspan="4">Total</td>
                             <th>${{ number_format($services->sum('cost'), 2, ".") }}</th>
                             <th>-</th>
                             <th>{{ $services->sum('no_rx')}}</th>
