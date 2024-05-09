@@ -39,8 +39,23 @@ class RaceRegistrationController extends Controller
             return $register->count();
         });
 
-
-        return view('admin.estadisticas.carrera', compact('ordersAll', 'amountByRegisters', 'totalPerType', 'totalPerSize', 'totalPerSex'));   
+        $registersall = $registers->get()
+        ->groupBy('branch_id')
+        ->map(function ($group, $branch_id) {
+            $total_amount = $group->sum('amount');
+            $total_registers = $group->count();
+            $branch = $group->first()->branch;
+            $branch_name = $branch ? $branch->name : 'Unknown Branch';
+    
+            return [
+                'id' => $branch_id,
+                'branch_name' => $branch_name,
+                'total_amount' => $total_amount,
+                'total_registers' => $total_registers,
+            ];
+        });
+    
+        return view('admin.estadisticas.carrera', compact('ordersAll', 'amountByRegisters', 'totalPerType', 'totalPerSize', 'totalPerSex', 'registersall'));   
     }
     public function index()
     {
