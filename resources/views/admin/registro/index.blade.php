@@ -36,6 +36,7 @@
                             <tr class="table-resource__headings">
                                 <th>Nombre</th>
                                 <th>Edad</th>
+                                <th>Sucursal</th>
                                 <th>Sexo</th>
                                 <th>Talla</th>
                                 <th>Celular</th>
@@ -53,6 +54,9 @@
                                 </td>
                                 <td data-label="Edad:">
                                     @{{ registersItem.age }}
+                                </td>
+                                <td data-label="Sucursal:">
+                                    @{{ registersItem.branch.name }}
                                 </td>
                                 <td data-label="Sexo:">
                                     @{{ registersItem.sex }}
