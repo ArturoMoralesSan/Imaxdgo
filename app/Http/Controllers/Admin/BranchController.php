@@ -14,7 +14,7 @@ class BranchController extends Controller
     public function index()
     {
         abort_unless(Gate::allows('view.branches') || Gate::allows('create.branches'), 403);
-        $branches = Branch::all();
+        $branches = Branch::all()->each->setAppends([]);
         return view('admin.sucursales.index', compact('branches'));   
     }
 
