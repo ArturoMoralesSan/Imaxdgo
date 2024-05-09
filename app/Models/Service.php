@@ -12,7 +12,7 @@ class Service extends Model
 
 
 
-    protected $appends = ['formated_date','list_studies','cost'];
+    protected $appends = ['formated_date','list_studies','cost', 'hour'];
 
 
     /**
@@ -24,6 +24,18 @@ class Service extends Model
     {
         return Carbon::parse($this->date)->format('d/m/Y');
     }
+
+    /**
+     * Return the slugified name of the section.
+     *
+     * @return string
+     */
+    public function getHourAttribute()
+    {   $created_at = $this->created_at; // Suponiendo que $model es tu modelo
+        $hora_creacion = Carbon::parse($created_at)->format('H:i A');
+        return $hora_creacion;
+    }
+
 
     
 
