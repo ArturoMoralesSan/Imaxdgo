@@ -18,10 +18,8 @@ class RaceRegistrationRequest extends FormRequest
         return [
             'name' => ['required', new NotUppercase, new NotLowercase, 'max:100'],
             'race_id' => ['required'],
-            'age' => ['required'],
             'sex' => ['required'],
             'size' => ['required'],
-            'cellphone' => ['required'],
             'type' => ['required'],
             'cost' => ['required'],
         ];
