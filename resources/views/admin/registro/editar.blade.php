@@ -76,6 +76,9 @@
                             <div class="md:col-1/2">
                                 <div class="form-control">
                                     <label for="age">Edad</label>
+                                    <span class="description">
+                                        Opcional
+                                    </span>
                                     <text-field name="age" v-model="fields.age" maxlength="100" initial="{{ $register->age }}"></text-field>
                                     <field-errors name="age"></field-errors>
                                 </div>
@@ -116,6 +119,9 @@
                                 {{-- nombres --}}
                                 <div class="form-control">
                                     <label for="cellphone">Celular</label>
+                                    <span class="description">
+                                        Opcional
+                                    </span>
                                     <text-field name="cellphone" v-model="fields.cellphone" maxlength="80" initial="{{ $register->cellphone }}"></text-field>
                                     <field-errors name="cellphone"></field-errors>
                                 </div>

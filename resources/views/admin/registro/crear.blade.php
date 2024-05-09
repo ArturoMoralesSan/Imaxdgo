@@ -76,6 +76,9 @@
                                 {{-- nombres --}}
                                 <div class="form-control">
                                     <label for="age">Edad</label>
+                                    <span class="description">
+                                        Opcional
+                                    </span>
                                     <text-field name="age" v-model="fields.age" maxlength="80" initial=""></text-field>
                                     <field-errors name="age"></field-errors>
                                 </div>
@@ -116,6 +119,9 @@
                                 {{-- nombres --}}
                                 <div class="form-control">
                                     <label for="cellphone">Celular</label>
+                                    <span class="description">
+                                        Opcional
+                                    </span>
                                     <text-field name="cellphone" v-model="fields.cellphone" maxlength="80" initial=""></text-field>
                                     <field-errors name="cellphone"></field-errors>
                                 </div>
