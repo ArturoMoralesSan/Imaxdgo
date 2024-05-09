@@ -18,19 +18,61 @@ class ServiceController extends Controller
     public function index()
     {
         abort_unless(Gate::allows('view.services') || Gate::allows('create.services'), 403);
+        $actual_month = Carbon::now()->month;
+        $actual_year  = Carbon::now()->year;
+
+        $years = collect([]);
+
+        $año_actual = Carbon::now()->year;
+
+        for ($año = 2023; $año <= $actual_year; $año++) {
+            $years[$año] = $año;
+        }
+
+        $months = collect([
+            '1' => 'Enero',
+            '2' => 'Febrero',
+            '3' => 'Marzo',
+            '4' => 'Abril',
+            '5' => 'Mayo',
+            '6' => 'Junio',
+            '7' => 'Julio',
+            '8' => 'Agosto',
+            '9' => 'Septiembre',
+            '10' => 'Octubre',
+            '11' => 'Noviembre',
+            '12' => 'Diciembre'
+        ]);
+
+        $search = \Request('search');
+
+        $month = \Request('month') != null ? \Request('month') : $actual_month;
+        $year  = \Request('year') != null ? \Request('year') : $actual_year;
+
+        $services = Service::with('branch:id,name','studies')
+        ->whereMonth('created_at', $month)
+        ->whereYear('created_at', $year)
+        ->orderBy('date','DESC');
         
-        $search     = \Request('search');
-        $services = Service::with('branch','studies')->orderBy('date','DESC')->paginate(20);
+
         if (!Auth::user()->isSuperAdmin()) {
-            $services = Service::with('branch','studies')->orderBy('date','DESC')->where('branch_id', Auth::user()->branch_id)->paginate(20);
-        } 
+            $services = $services->where('branch_id', Auth::user()->branch_id);
+        }
         
         if($search) {
             $services = $services->where('patient', 'LIKE', '%'.$search.'%');
         }
+
+        $services = $services->paginate(20);
+
+        $services->getCollection()->transform(function ($service) {
+            $service->branch->setAppends([]);
+            return $service;
+        });
+        
         $servicesItems = Collect($services->items());
 
-        return view('admin.servicios.index', compact('services', 'servicesItems')); 
+        return view('admin.servicios.index', compact('services', 'servicesItems', 'years', 'months', 'actual_month', 'actual_year')); 
     }
 
     public function create()
