@@ -9,6 +9,8 @@ use App\Models\Service;
 use App\Models\Expense;
 use Carbon\Carbon;
 use Auth;
+use App\Models\RaceRegistration;
+
 use Luecano\NumeroALetras\NumeroALetras;
 
 class PdfController extends Controller
@@ -68,6 +70,20 @@ class PdfController extends Controller
         $pdf = PDF::loadView('admin.pdf.index', compact('services', 'expenses', 'start_date', 'end_date', 'servicesPerPayments', 'serviceswithinCash'));
         $pdf->setPaper('letter', 'portrait'); 
         return $pdf->stream('reporte-ingresos-sucursal.pdf',['Attachment' => false]);
+        //return $pdf->download('reporte-ingresos-sucursal.pdf');   
+    }
+
+    public function pdfRace($id)
+    {
+        if (!Auth::user()->isSuperAdmin()) { 
+            $id = Auth::user()->branch_id;
+        }
+        $registers = RaceRegistration::where('branch_id', $id)
+        ->get();
+        
+        $pdf = PDF::loadView('admin.pdf.race', compact('registers'));
+        $pdf->setPaper('letter', 'portrait'); 
+        return $pdf->stream('reporte-carrera-sucursal.pdf',['Attachment' => false]);
         //return $pdf->download('reporte-ingresos-sucursal.pdf');   
     }
 
