@@ -8,13 +8,39 @@
 
 @section('content')
     <div class="dashboard-heading">
-        <h1 class="dashboard-heading__title">
-            Servicios
-        </h1>
-
-        <p class="dashboard-heading__caption">
-            Hay {{ $services->count() }} servicios registrados.
-        </p>
+        <div class="md:row justify-between">
+            <div class="md:col-1/2">
+                <h1 class="dashboard-heading__title">
+                    Servicios
+                </h1>
+                <p class="dashboard-heading__caption">
+                    Hay {{ $services->count() }} servicios registrados.
+                </p>
+            </div>
+            <div class="md:col-1/2 d-flex items-center">
+                <div class="row">
+                    <div class="md:col-1/2">
+                        <label for="month">Mes</label>
+                        <select-filter
+                            name="month"
+                            selected="{{ app('request')->input('month') ? app('request')->input('month') : $actual_month }}"
+                            :options="{{ $months }}"
+                        >
+                        </select-filter>
+                    </div>
+                    <div class="md:col-1/2">
+                        <label for="year">Año</label>
+                        <select-filter
+                            name="year"
+                            selected="{{ app('request')->input('year') ? app('request')->input('year'): $actual_year }}"
+                            :options="{{ $years }}"
+                        >
+                        </select-filter>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
     </div>
 
     <div class="fluid-container mb-16">
@@ -45,6 +71,7 @@
                         <thead>
                             <tr class="table-resource__headings">
                                 <th>Fecha</th>
+                                <th>Hora</th>
                                 <th>Sucursal</th>
                                 <th>Paciente</th>
                                 <th>N° estudios</th>
@@ -60,6 +87,9 @@
                             <tr v-for="serviceItem in resourceList" class="table-resource__row" :key="serviceItem.id">
                                 <td data-label="Fecha:">
                                     @{{ serviceItem.formated_date }}
+                                </td>
+                                <td data-label="Hora:">
+                                    @{{ serviceItem.hour }}
                                 </td>
                                 <td data-label="Sucursal:">
                                     @{{ serviceItem.branch.name }}
