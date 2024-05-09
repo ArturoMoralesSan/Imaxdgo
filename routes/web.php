@@ -47,6 +47,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], functio
     Route::get('/', [DashboardController::class, 'index']);
 
     Route::get('pdf/{id}', [PdfController::class, 'pdf']);
+
+    Route::get('pdf-carrera/{id}', [PdfController::class, 'pdfRace']);
+
     Route::get('pdf-egreso/{id}', [PdfController::class, 'pdfEgreso']);
     Route::get('pdf-gasto/{id}', [PdfController::class, 'pdfGasto']);
         
@@ -159,5 +162,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], functio
     Route::put('carrera-participantes/{id}/actualizar', [RaceRegistrationController::class, 'update']);
     Route::delete('carrera-participantes/eliminar/{id}', [RaceRegistrationController::class, 'delete']);
 
+    Route::get('carrera-estadistica', [RaceRegistrationController::class, 'statics']);
 
 });
