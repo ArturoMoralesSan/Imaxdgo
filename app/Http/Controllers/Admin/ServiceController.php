@@ -117,13 +117,17 @@ class ServiceController extends Controller
             $last_service = Service::where('branch_id', $request->branch_id)
             ->orderBy('id','DESC')
             ->first();
-
-            if ($last_service->folio == null) {
-                $number_next = 0;
-                
+            if ($last_service) {
+                if ($last_service->folio == null) {
+                    $number_next = 0;
+                    
+                } else {
+                    $number_next = intval(substr($last_service->folio, 1));
+                }
             } else {
-                $number_next = intval(substr($last_service->folio, 1));
+                $number_next = 0;
             }
+            
 
             $number_next = $number_next + 1;
 
