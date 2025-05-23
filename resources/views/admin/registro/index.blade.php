@@ -34,6 +34,7 @@
                     <table class="table size-caption mx-auto mb-16 md:table--responsive">
                         <thead>
                             <tr class="table-resource__headings">
+                                <th>Fecha</th>
                                 <th>Nombre</th>
                                 <th>Edad</th>
                                 <th>Sucursal</th>
@@ -49,6 +50,9 @@
 
                         <tbody>
                             <tr v-for="registersItem in resourceList" class="table-resource__row" :key="registersItem.id">
+                                <td data-label="Fecha:">
+                                    @{{ registersItem.formated_date }}
+                                </td>
                                 <td data-label="Nombre:">
                                     @{{ registersItem.name }}
                                 </td>

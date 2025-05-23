@@ -36,7 +36,8 @@ class DashboardController extends Controller
 
         } else {
 
-            $start_date = \Request('start_date') != null ? \Request('start_date') : $dateNow->subDays(5)->format('Y-m-d');
+            //$start_date = \Request('start_date') != null ? \Request('start_date') : $dateNow->subDays(0)->format('Y-m-d');
+            $start_date = \Request('start_date') != null ? \Request('start_date') : $dateFormat;
             $end_date   = \Request('end_date') != null ? \Request('end_date') : $dateFormat ;
 
             $Servicesnow   = Service::where('date', $dateFormat);

@@ -24,6 +24,12 @@ class ExpenseController extends Controller
             $expenses = $expenses->where('branch_id', Auth::user()->branch_id);
         } 
         $expenses = $expenses->paginate(10);
+
+        $expenses->getCollection()->transform(function ($expense) {
+            $expense->branch->setAppends([]);
+            return $expense;
+        });
+
         $expensesItems = Collect($expenses->items());
         return view('admin.gastos.index', compact('expenses', 'expensesItems'));   
     }

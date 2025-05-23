@@ -21,7 +21,7 @@ class PdfController extends Controller
         $dateNow    = Carbon::now();
         $dateFormat = $dateNow->format('Y-m-d');
 
-        $start_date = \Request('start_date') != null ? \Request('start_date') : $dateNow->subDays(5)->format('Y-m-d');
+        $start_date = \Request('start_date') != null ? \Request('start_date') : $dateFormat;
         $end_date   = \Request('end_date') != null ? \Request('end_date') : $dateFormat ;
         
         if (!Auth::user()->isSuperAdmin()) {
@@ -92,7 +92,7 @@ class PdfController extends Controller
         $dateNow    = Carbon::now();
         $dateFormat = $dateNow->format('Y-m-d');
 
-        $start_date = \Request('start_date') != null ? \Request('start_date') : $dateNow->subDays(5)->format('Y-m-d');
+        $start_date = \Request('start_date') != null ? \Request('start_date') : $dateFormat;
         $end_date   = \Request('end_date') != null ? \Request('end_date') : $dateFormat ;
         
         if (!Auth::user()->isSuperAdmin()) {

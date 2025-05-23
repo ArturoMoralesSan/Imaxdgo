@@ -22,7 +22,7 @@ class Service extends Model
      */
     public function getFormatedDateAttribute()
     {
-        return Carbon::parse($this->date)->format('d/m/Y');
+        return Carbon::parse($this->created_at)->format('d/m/Y');
     }
 
     /**
