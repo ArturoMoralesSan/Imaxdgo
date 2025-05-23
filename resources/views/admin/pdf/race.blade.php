@@ -18,6 +18,7 @@
                     <thead>
                       <tr>
                         <th scope="col">ID</th>
+                        <th scope="col">Fecha</th>
                         <th scope="col">Nombre completo</th>
                         <th scope="col">Edad</th>
                         <th scope="col">Sexo</th>
@@ -31,6 +32,7 @@
                         @foreach ($registers as $register)
                         <tr>
                             <th scope="row">{{ $register->id }}</th>
+                            <td>{{ $register->formated_date }}</td>
                             <td>{{ $register->name }}</td>
                             <td>{{ $register->age }}</td>
                             <td>{{ $register->sex }}</td>
@@ -45,7 +47,7 @@
                     <tfoot>
                         <tr>
                             
-                            <td colspan="7">Total</td>
+                            <td colspan="8">Total</td>
                             <th>${{ number_format($registers->sum('cost'), 2, ".") }}</th>
                             
                         </tr>
