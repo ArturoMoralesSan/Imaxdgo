@@ -12,6 +12,7 @@ class ServiceRequest extends FormRequest
             'patient'   => 'required|string|max:160',
             'rx_prev'   => 'required|max:10',
             'branch_id' => 'required|max:20',
+            'doctor_id' => 'max:20',
             'print'     => 'required',
             'no_rx'     => 'required_if:print,Sí',
             'study.*._estudio' => 'required|string|max:255',

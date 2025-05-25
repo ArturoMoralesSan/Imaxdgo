@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Service;
 use App\Models\Branch;
 use App\Models\Study;
+use App\Models\Doctor;
 use App\Models\Payment;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\ServiceRequest;
@@ -49,7 +50,7 @@ class ServiceController extends Controller
         $month = \Request('month') != null ? \Request('month') : $actual_month;
         $year  = \Request('year') != null ? \Request('year') : $actual_year;
 
-        $services = Service::with('branch:id,name','studies')
+        $services = Service::with('branch:id,name','studies','doctor')
         ->whereMonth('created_at', $month)
         ->whereYear('created_at', $year)
         ->orderBy('date','DESC');
@@ -67,10 +68,17 @@ class ServiceController extends Controller
 
         $services->getCollection()->transform(function ($service) {
             $service->branch->setAppends([]);
+
+            $service->doctor_name = $service->doctor
+                ? trim($service->doctor->name . ' ' . $service->doctor->last_name)
+                : 'Sin doctor';
+
             return $service;
         });
         
+
         $servicesItems = Collect($services->items());
+
 
         return view('admin.servicios.index', compact('services', 'servicesItems', 'years', 'months', 'actual_month', 'actual_year')); 
     }
@@ -78,14 +86,19 @@ class ServiceController extends Controller
     public function create()
     {
         abort_unless(Gate::allows('view.services') || Gate::allows('create.services'), 403);
+
         if (!Auth::user()->isSuperAdmin()) {
             $branches = Branch::where('id', Auth::user()->branch_id)->pluck('name','id');
         } else {
             $branches = Branch::pluck('name','id');
-        }        
+        }
+
+        $doctors = Doctor::all()->mapWithKeys(function ($doctor) {
+            return [$doctor->id => $doctor->name . ' ' . $doctor->last_name];
+        });        
         $payments = Payment::pluck('name','id');
-        $studies = Study::pluck('name','id');
-        return view('admin.servicios.crear', compact('branches', 'studies', 'payments'));   
+        $studies  = Study::pluck('name','id');
+        return view('admin.servicios.crear', compact('doctors','branches', 'studies', 'payments'));   
     }
 
     public function edit($id)
@@ -95,14 +108,17 @@ class ServiceController extends Controller
             $branches = Branch::where('id', Auth::user()->branch_id)->pluck('name','id');
         } else {
             $branches = Branch::pluck('name','id');
-        }        
+        }  
+        $doctors = Doctor::all()->mapWithKeys(function ($doctor) {
+            return [$doctor->id => $doctor->name . ' ' . $doctor->last_name];
+        });      
         $payments = Payment::pluck('name','id');
         $studies = Study::pluck('name','id');
         $service = Service::find($id);
         
         $assigned_studies = $service->studies()->get();
         $assigned_payments = $service->payments()->get();
-        return view('admin.servicios.editar', compact('assigned_payments','assigned_studies', 'branches', 'studies','service', 'payments'));   
+        return view('admin.servicios.editar', compact('doctors', 'assigned_payments','assigned_studies', 'branches', 'studies','service', 'payments'));   
     }
 
     public function save(ServiceRequest $request)
@@ -152,6 +168,7 @@ class ServiceController extends Controller
         $service->patient = $request->patient;
         $service->last_rx = $request->rx_prev;
         $service->branch_id = $request->branch_id;
+        $service->doctor_id = $request->doctor_id;
         $service->year = $date->year;
         $service->month = $date->month;
         $service->week = $date->week;

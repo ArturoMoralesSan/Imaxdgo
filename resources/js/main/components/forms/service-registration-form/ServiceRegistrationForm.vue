@@ -46,12 +46,34 @@
             </div>
         </div>
         
-        
-        <div class="form-control">
-            <label for="patient">Paciente</label>
-            <text-field class="field-get-researcher"  name="patient" v-model="fields.patient" maxlength="160" :initial="ServiceData.patient  || '' "></text-field>
-            <field-errors name="patient"></field-errors>
+        <div class="row mb-4">
+            <div class="col">
+                <div class="form-control">
+                    <label for="patient">Paciente</label>
+                    <text-field class="field-get-researcher"  name="patient" v-model="fields.patient" maxlength="160" :initial="ServiceData.patient  || '' "></text-field>
+                    <field-errors name="patient"></field-errors>
+                </div>
+            </div>
         </div>
+        <div class="row mb-4">
+            <div class="col">
+                <div class="form-control">
+                    <label for="doctor">Doctor <span class="description">
+                                    Opcional
+                                </span></label>
+                    <search-select-field 
+                        name="doctor_id" 
+                        v-model="fields.doctor_id" 
+                        :options="doctors"
+                        :initial="(ServiceData.doctor_id || '')"
+                    >
+                    </search-select-field>
+                    <field-errors name="doctor_id"></field-errors>
+                </div>
+            </div>
+        </div>
+
+
         <div class="mb-4">
             <StudyForm v-for="i in fields.studies_count" :key="i"
                 :index="i"
@@ -191,7 +213,10 @@
                 required: true,
                 type: [Array, Object]
             },
-            
+            doctors: {
+                required: true,
+                type: [Array, Object]
+            },
             ServiceData: {
                 required: true,
                 type: [Object, Array]

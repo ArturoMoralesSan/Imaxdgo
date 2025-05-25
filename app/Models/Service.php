@@ -57,6 +57,16 @@ class Service extends Model
         return $this->belongsTo(Branch::class);
     }
 
+     /**
+     * Get the branch that owns the submenu.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function doctor()
+    {
+        return $this->belongsTo(Doctor::class);
+    }
+
     /**
      * A permission can be applied to many studies.
      *

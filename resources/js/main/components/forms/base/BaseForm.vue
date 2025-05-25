@@ -6,6 +6,7 @@
     import FileField from './FileField.vue';
     import FormButton from './FormButton.vue';
     import SelectField from './SelectField.vue';
+    import SearchSelectField from './SearchSelectField.vue';
     import TextArea from './TextArea.vue';
     import TextField from './TextField.vue';
 
@@ -16,6 +17,7 @@
             FileField,
             FormButton,
             SelectField,
+            SearchSelectField,
             TextArea,
             TextField,
             DateField

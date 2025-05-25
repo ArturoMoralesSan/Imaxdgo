@@ -74,6 +74,7 @@
                                 <th>Hora</th>
                                 <th>Sucursal</th>
                                 <th>Paciente</th>
+                                <th>Doctor</th>
                                 <th>N° estudios</th>
                                 <th>Costo</th>
                                 <th>Impresa</th>
@@ -96,6 +97,9 @@
                                 </td>
                                 <td data-label="Paciente:">
                                     @{{ serviceItem.patient }}
+                                </td>
+                                <td data-label="Doctor:">
+                                    @{{ serviceItem.doctor_name }}
                                 </td>
                                 <td data-label="Paciente:">
                                     @{{ serviceItem.studies.length }}

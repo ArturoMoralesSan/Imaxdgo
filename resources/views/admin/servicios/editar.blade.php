@@ -27,6 +27,7 @@
             :study="4"
             :min-study="1"
             :branches="{{ $branches }}"
+            :doctors="{{ $doctors }}"
             :studies-data="{{ $studies }}"
             :assigned-studies="{{ $assigned_studies }}"
             :service-data="{{ $service }}"

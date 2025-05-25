@@ -15,13 +15,13 @@
             <div class="md:col-2/3 sm:col">
                 <div class="form-control">
                     <label :for="'study' + index + '-estudio'">Estudio</label>
-                    <select-field
+                    <search-select-field
                     :name="'study' + index + '_estudio'"
                     v-model="fields['study' + index + '_estudio']"
                     :options="studiesData"
                     :initial="((typeof assignedStudies[index-1] !== 'undefined') ? assignedStudies[index-1].id.toString() : '')"
                     >
-                    </select-field>
+                    </search-select-field>
                     <field-errors :name="'study' + index + '_estudio'"></field-errors>
                 </div>
             </div>
@@ -31,12 +31,12 @@
 </template>
 
 <script>
-    import SelectField from '../base/SelectField.vue';
+    import SearchSelectField from '../base/SearchSelectField.vue';
     import TextField from '../base/TextField.vue';
     import FieldErrors from '../base/FieldErrors.vue';
 
     export default {
-        components: { SelectField, FieldErrors, TextField },
+        components: { SearchSelectField, FieldErrors, TextField },
 
         props: {
             studiesData: {
