@@ -73,6 +73,61 @@ class PdfController extends Controller
         //return $pdf->download('reporte-ingresos-sucursal.pdf');   
     }
 
+    public function pdfDoctors($id, $branch_id = null)
+    {
+        $dateNow    = Carbon::now();
+        $dateFormat = $dateNow->format('Y-m-d');
+
+        $start_date = \Request('start_date') != null ? \Request('start_date') : $dateFormat;
+        $end_date   = \Request('end_date') != null ? \Request('end_date') : $dateFormat ;
+        
+        if (!Auth::user()->isSuperAdmin()) {
+            $start_date = \Request('start_date') != null ? \Request('start_date') : $dateFormat;
+            $end_date   = \Request('end_date') != null ? \Request('end_date') : $dateFormat ;
+
+            $branch_id = Auth::user()->branch_id;
+        }
+
+        $servicesQuery = Service::with('doctor', 'studies', 'branch')
+        ->whereBetween('date', [$start_date, $end_date])
+        ->where('doctor_id', $id);
+
+        if ($branch_id) {
+            $servicesQuery->where('branch_id', $branch_id);
+        }
+
+        $services = $servicesQuery->get();
+
+        $allStudies = $services->flatMap(function ($service) {
+            return $service->studies;
+        });
+
+        $studiesCount = $allStudies
+            ->groupBy('name')
+            ->map(function ($group, $studyName) {
+                return [
+                    'study_name' => $studyName,
+                    'count' => $group->count(),
+                ];
+            })
+            ->sortByDesc('count')
+            ->values();
+            $doctor = $services->first()?->doctor;
+            $doctorName = $doctor ? "{$doctor->name} {$doctor->last_name}" : 'No disponible';
+            $branchName = ($branch_id && $services->isNotEmpty()) ? $services->first()->branch->name : null;
+            $totalServices = $services->count();
+
+
+
+        $start_date = Carbon::createFromFormat('Y-m-d', $start_date)->format('d/m/Y');
+        $end_date   = Carbon::createFromFormat('Y-m-d', $end_date)->format('d/m/Y');
+
+        $pdf = PDF::loadView('admin.pdf.doctorservices', compact('totalServices', 'doctorName', 'branchName','studiesCount', 'start_date', 'end_date'));
+        $pdf->setPaper('letter', 'portrait'); 
+        return $pdf->stream('reporte-ingresos-sucursal.pdf',['Attachment' => false]);
+        //return $pdf->download('reporte-ingresos-sucursal.pdf');   
+    }
+
     public function pdfRace($id)
     {
         if (!Auth::user()->isSuperAdmin()) { 

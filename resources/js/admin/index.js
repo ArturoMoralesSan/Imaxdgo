@@ -28,6 +28,7 @@ import FormBetweenDateSearch from './components/FormBetweenDateSearch.vue';
 import SelectFilter from './components/SelectFilter.vue';
 
 import LinkPdf from './components/LinkPdf.vue';
+import LinkPdfs from './components/LinkPdfs.vue';
 
 
 (function() {
@@ -63,6 +64,7 @@ import LinkPdf from './components/LinkPdf.vue';
     Vue.component('select-filter', SelectFilter);
     Vue.component('service-registration-form', ServiceRegistrationForm);
     Vue.component('link-pdf', LinkPdf);
+    Vue.component('link-pdfs', LinkPdfs);
 
 
     const vm = new Vue({

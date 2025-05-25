@@ -49,6 +49,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], functio
 
     Route::get('pdf/{id}', [PdfController::class, 'pdf']);
 
+    Route::get('pdf-doctores/{id}/{branch_id?}', [PdfController::class, 'pdfDoctors']);
+
+
     Route::get('pdf-carrera/{id}', [PdfController::class, 'pdfRace']);
 
     Route::get('pdf-egreso/{id}', [PdfController::class, 'pdfEgreso']);
