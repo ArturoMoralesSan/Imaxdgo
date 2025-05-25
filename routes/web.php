@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\BranchController;
+use App\Http\Controllers\Admin\DoctorController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\ExpenseController;
 use App\Http\Controllers\Admin\PaymentController;
@@ -85,6 +86,14 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], functio
     Route::get('roles/{id}/editar', [RoleController::class, 'edit']);
     Route::put('roles/{id}/actualizar', [RoleController::class, 'update']);
     Route::delete('roles/eliminar/{id}', [RoleController::class, 'delete']);
+
+    //Doctores
+    Route::get('doctores', [DoctorController::class, 'index']);
+    Route::view('agregar-doctores', 'admin.doctores.crear');
+    Route::post('doctores/crear', [DoctorController::class, 'save']);
+    Route::get('doctores/{id}/editar', [DoctorController::class, 'edit']);
+    Route::put('doctores/{id}/actualizar', [DoctorController::class, 'update']);
+    Route::delete('doctores/eliminar/{id}', [DoctorController::class, 'delete']);
 
     //Servicios
     Route::get('servicios', [ServiceController::class, 'index']);
