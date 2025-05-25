@@ -11,6 +11,7 @@ use App\Models\Expense;
 use App\Models\TypeExpense;
 use App\Models\Study;
 use App\Models\Branch;
+use App\Models\Doctor;
 use DB;
 class DashboardController extends Controller
 {
@@ -128,14 +129,48 @@ class DashboardController extends Controller
                 $q->whereBetween('date', [$start_date, $end_date]);
             })->get();
 
-            
+        
             $branchesExpenses = Branch::with(['expenses' => function($q) use ($start_date, $end_date) {
                 $q->whereBetween('date', [$start_date, $end_date]);
             }])->whereHas('expenses', function($q) use ($start_date, $end_date){
                 $q->whereBetween('date', [$start_date, $end_date]);
             })->get();
 
-            return view('admin.dashboard-admin', compact('branches','studiesCount','servicesPerPayments','expensesCount','ordersAll', 'servicesCount', 'CostbyServices','string_date', 'ingreso', 'gasto', 'days', 'branchesExpenses', 'expensesByType'));   
+
+            $servicesData = Service::with(['doctor', 'branch'])
+            ->whereBetween('date', [$start_date, $end_date])
+            ->get()
+            ->filter(function ($service) {
+                return $service->doctor !== null; // <-- FILTRA SOLO SI TIENE DOCTOR
+            });
+
+            $groupedByBranch = $servicesData->groupBy(function($service) {
+                return $service->branch->name;
+            });
+
+            $topDoctorsByBranch = $groupedByBranch->map(function($services, $branchName) {
+                return $services->groupBy('doctor.id') 
+                    ->map(function($servicesByDoctor) {
+                        return [
+                            'doctor' => $servicesByDoctor->first()->doctor,
+                            'count' => $servicesByDoctor->count(),
+                        ];
+                    })
+                    ->sortByDesc('count')
+                    ->take(10);
+            });
+
+            $topDoctorsByBranch = $topDoctorsByBranch->map(function ($doctors) {
+                return $doctors->map(function ($entry) {
+                    return [
+                        'id' => $entry['doctor']->id,
+                        'name' => $entry['doctor']->name. ' '. $entry['doctor']->last_name,
+                        'count_services' => $entry['count'],
+                    ];
+                });
+            });
+
+            return view('admin.dashboard-admin', compact('topDoctorsByBranch','branches','studiesCount','servicesPerPayments','expensesCount','ordersAll', 'servicesCount', 'CostbyServices','string_date', 'ingreso', 'gasto', 'days', 'branchesExpenses', 'expensesByType'));   
             
         } 
     }
