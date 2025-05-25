@@ -175,7 +175,7 @@
             </div>
         </div>
         <div class="md:row">
-            <div class="md:col-1/3">
+            <div class="md:col-1/2">
                 <section class="db-panel">
                     <h3 class="db-panel__title">
                         Estudios más populares
@@ -206,7 +206,7 @@
                     </resource-table>
                 </section>
             </div>
-            <div class="md:col-1/3">
+            <div class="md:col-1/2">
                 <section class="db-panel">
                     <h3 class="db-panel__title">
                         Gastos más populares
@@ -247,48 +247,65 @@
                     </resource-table>
                 </section>
             </div>
-            <div class="md:col-1/3">
+            
+        </div>
+        <div class="md:row">
+            <div class="md:col">
                 <section class="db-panel">
                     <h3 class="db-panel__title">
-                        Top 10 doctores
+                        Top 5 doctores
                     </h3>
-                    @foreach($topDoctorsByBranch as $key => $doctors)
-                        <h5 class="h5"><strong>{{ $key }}</strong></h5>
-                        <resource-table :breakpoint="800" :model="{{ $doctors }}" inline-template>
+                    <tabs-component :tabs='{ "global": "Top 5 Global", "branch": "top 5 global por Sucursal" }' initial="global">
 
-                            <table class="table size-caption mx-auto md:table--responsive">
-                                <thead>
-                                    <tr class="table-resource__headings">
-                                        <th>Doctor</th>
-                                        <th>Cantidad de servicios</th>
-                                        <th>Reporte</th>
-                                    </tr>
-                                </thead>
+                        {{-- Panel: Top Global --}}
+                        <template #panel-global>
 
-                                <tbody>
-                                    <tr v-for="doctorItem in resourceList" class="table-resource__row" :key="doctorItem.id">
-                                        <td data-label="Estudio:">
-                                            @{{ doctorItem.name }}
-                                        </td>
-                                        <td data-label="Cantidad de servicios:">
-                                            @{{ doctorItem.count_services }}
-                                        </td>
-                                        <td data-label="Reporte:">
-                                            <link-pdf 
-                                                :branchid="doctorItem.id" 
-                                                url="/admin/pdf/"
-                                                startdate="{{ app('request')->input('start_date') }}"
-                                                enddate="{{ app('request')->input('end_date') }}">
-                                            </link-pdf>                                   
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            <resource-table :breakpoint="800" :model="{{ $topGlobalDoctors->values()->toJson() }}" inline-template>
+                                <table class="table size-caption mx-auto mb-16 md:table--responsive">
+                                    <thead>
+                                        <tr class="table-resource__headings">
+                                            <th>Doctor</th>
+                                            <th>Cantidad de Servicios</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="item in resourceList" class="table-resource__row" :key="item.id">
+                                            <td data-label="Doctor">@{{ item.name }}</td>
+                                            <td data-label="Cantidad">@{{ item.total_services }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </resource-table>
+                        </template>
 
-                        </resource-table>
+                        {{-- Panel: Por Sucursal --}}
+                        <template #panel-branch>
+                            
+                            @foreach ($topGlobalDoctorsByBranch as $branchName => $doctors)
+                                <div class="mb-6">
+                                    <h4 class="text-lg font-semibold mb-2">{{ $branchName }}</h4>
 
-                    @endforeach()
-                    
+                                    <resource-table :breakpoint="800" :model="{{ $doctors->values()->toJson() }}" inline-template>
+                                        <table class="table size-caption mx-auto mb-16 md:table--responsive">
+                                            <thead>
+                                                <tr class="table-resource__headings">
+                                                    <th>Doctor</th>
+                                                    <th>Cantidad de Servicios</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-for="item in resourceList" class="table-resource__row" :key="item.id">
+                                                    <td data-label="Doctor">@{{ item.name }}</td>
+                                                    <td data-label="Cantidad">@{{ item.count_services }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </resource-table>
+                                </div>
+                            @endforeach
+                        </template>
+                    </tabs-component>
+
                 </section>
             </div>
         </div>

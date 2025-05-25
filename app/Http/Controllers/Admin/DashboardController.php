@@ -140,37 +140,44 @@ class DashboardController extends Controller
             $servicesData = Service::with(['doctor', 'branch'])
             ->whereBetween('date', [$start_date, $end_date])
             ->get()
-            ->filter(function ($service) {
-                return $service->doctor !== null; // <-- FILTRA SOLO SI TIENE DOCTOR
-            });
+            ->filter(fn($service) => $service->doctor !== null);
 
-            $groupedByBranch = $servicesData->groupBy(function($service) {
-                return $service->branch->name;
-            });
+            $topGlobalDoctors = $servicesData
+            ->groupBy('doctor.id')
+            ->map(function ($services) {
+                $doctor = $services->first()->doctor;
+                return [
+                    'id' => $doctor->id,
+                    'name' => $doctor->name . ' ' . $doctor->last_name,
+                    'total_services' => $services->count(),
+                    'doctor' => $doctor,
+                ];
+            })
+            ->sortByDesc('total_services')
+            ->take(5);
 
-            $topDoctorsByBranch = $groupedByBranch->map(function($services, $branchName) {
-                return $services->groupBy('doctor.id') 
-                    ->map(function($servicesByDoctor) {
-                        return [
-                            'doctor' => $servicesByDoctor->first()->doctor,
-                            'count' => $servicesByDoctor->count(),
-                        ];
-                    })
-                    ->sortByDesc('count')
-                    ->take(10);
-            });
+            $doctorIds = $topGlobalDoctors->pluck('id');
 
-            $topDoctorsByBranch = $topDoctorsByBranch->map(function ($doctors) {
-                return $doctors->map(function ($entry) {
-                    return [
-                        'id' => $entry['doctor']->id,
-                        'name' => $entry['doctor']->name. ' '. $entry['doctor']->last_name,
-                        'count_services' => $entry['count'],
-                    ];
+            $topGlobalDoctorsByBranch = $servicesData
+                ->filter(fn($service) => $doctorIds->contains($service->doctor_id))
+                ->groupBy(function ($service) {
+                    return $service->branch->name;
+                })
+                ->map(function ($servicesInBranch) {
+                    return $servicesInBranch->groupBy('doctor.id')
+                        ->map(function ($servicesByDoctor) {
+                            $doctor = $servicesByDoctor->first()->doctor;
+                            return [
+                                'id' => $doctor->id,
+                                'name' => $doctor->name . ' ' . $doctor->last_name,
+                                'count_services' => $servicesByDoctor->count(),
+                                'branch_id' => $servicesByDoctor->first()->branch->id,
+                            ];
+                        });
                 });
-            });
 
-            return view('admin.dashboard-admin', compact('topDoctorsByBranch','branches','studiesCount','servicesPerPayments','expensesCount','ordersAll', 'servicesCount', 'CostbyServices','string_date', 'ingreso', 'gasto', 'days', 'branchesExpenses', 'expensesByType'));   
+
+            return view('admin.dashboard-admin', compact('topGlobalDoctors','topGlobalDoctorsByBranch','branches','studiesCount','servicesPerPayments','expensesCount','ordersAll', 'servicesCount', 'CostbyServices','string_date', 'ingreso', 'gasto', 'days', 'branchesExpenses', 'expensesByType'));   
             
         } 
     }
