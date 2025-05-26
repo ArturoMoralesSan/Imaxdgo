@@ -13,14 +13,14 @@ class DoctorController extends Controller
 {
     public function index()
     {
-        abort_unless(Gate::allows('view.branches') || Gate::allows('create.branches'), 403);
+        abort_unless(Gate::allows('view.services') || Gate::allows('create.services'), 403);
         $doctors = Doctor::all()->each->setAppends([]);
         return view('admin.doctores.index', compact('doctors'));   
     }
 
     public function save(DoctorRequest $request)
     {
-        abort_unless(Gate::allows('view.branches') || Gate::allows('edit.branches'), 403);
+        abort_unless(Gate::allows('view.services') || Gate::allows('edit.services'), 403);
         
         $doctor = new Doctor;
         $doctor->name = $request->name;
@@ -40,7 +40,7 @@ class DoctorController extends Controller
 
     public function edit($id)
     {
-        abort_unless(Gate::allows('view.branches') || Gate::allows('edit.branches'), 403);
+        abort_unless(Gate::allows('view.services') || Gate::allows('edit.services'), 403);
         $doctor = Doctor::find($id);
         return view('admin.doctores.editar', compact('doctor'));
     }
@@ -48,7 +48,7 @@ class DoctorController extends Controller
 
     public function update(DoctorRequest $request, $id)
     {
-        abort_unless(Gate::allows('view.branches') || Gate::allows('edit.branches'), 403);
+        abort_unless(Gate::allows('view.services') || Gate::allows('edit.services'), 403);
 
         $doctor = Doctor::find($id);
         $doctor->name = $request->name;
@@ -68,7 +68,7 @@ class DoctorController extends Controller
 
     public function delete($id)
     {
-        abort_unless(Gate::allows('view.branches') || Gate::allows('create.branches'), 403);
+        abort_unless(Gate::allows('view.services') || Gate::allows('create.services'), 403);
 
         $doctor = Doctor::find($id);
         $doctor->delete();
