@@ -49,7 +49,8 @@
                                 <th>C.P</th>
                                 <th>Correo electrónico</th>
                                 <th>Teléfono</th>
-                                <th>Cantidad de estudios</th>
+                                <th>Cantidad de servicios</th>
+                                <th>Último servicio</th>
                                 <th class="pr-4">Acciones</th>
                             </tr>
                         </thead>
@@ -75,9 +76,12 @@
                                 <td data-label="Teléfono:">
                                     @{{ doctorsItem.tel }}
                                 </td>
-                                <td data-label="Cantidad de estudios:">
+                                <td data-label="Cantidad de servicios:">
                                     @{{ doctorsItem.count_services }}
-                                </td>                                
+                                </td> 
+                                <td data-label="último servicio:">
+                                    @{{ doctorsItem.last_service_date }}
+                                </td>                               
 
                                 <td class="table-resource__actions" data-label="Acciones:">
                                     <a class="btn btn-nowrap btn--sm btn--blue table-resource__button mr-2" :href="$root.path + '/admin/doctores/' + doctorsItem.id + '/editar' ">
