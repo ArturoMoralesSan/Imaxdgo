@@ -19,6 +19,15 @@
 
     <div class="fluid-container mb-16">
         @include('components.alert')
+
+        <form-search 
+            selected="{{ app('request')->input('search') }}"
+        >
+        <template slot="svg-search">
+            <img class="search-form_icon" src="{{ url('img/svg/search.svg') }}" alt="">
+        </template>
+        </form-search>
+
         <section class="db-panel">
             <h3 class="db-panel__title">
                 Lista de doctores
@@ -30,7 +39,7 @@
                 </p>
             @else
 
-                <resource-table :breakpoint="800" :model="{{ $doctors }}" inline-template>
+                <resource-table :breakpoint="800" :model="{{ $doctorsItems }}" inline-template>
                     <table class="table size-caption mx-auto mb-16 md:table--responsive">
                         <thead>
                             <tr class="table-resource__headings">
@@ -40,6 +49,7 @@
                                 <th>C.P</th>
                                 <th>Correo electrónico</th>
                                 <th>Teléfono</th>
+                                <th>Cantidad de estudios</th>
                                 <th class="pr-4">Acciones</th>
                             </tr>
                         </thead>
@@ -65,7 +75,9 @@
                                 <td data-label="Teléfono:">
                                     @{{ doctorsItem.tel }}
                                 </td>
-                                
+                                <td data-label="Cantidad de estudios:">
+                                    @{{ doctorsItem.count_services }}
+                                </td>                                
 
                                 <td class="table-resource__actions" data-label="Acciones:">
                                     <a class="btn btn-nowrap btn--sm btn--blue table-resource__button mr-2" :href="$root.path + '/admin/doctores/' + doctorsItem.id + '/editar' ">
@@ -86,6 +98,7 @@
                     </table>
 
                 </resource-table>
+                {{ $doctors->links('layout.pagination')}}
 
             @endif
 

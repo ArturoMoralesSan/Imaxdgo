@@ -9,6 +9,14 @@ class Doctor extends Model
 {
     use HasFactory;
 
+    
+    protected $appends = ['count_services'];
+
+
+    public function getCountServicesAttribute() {
+        return $this->services->count();
+    }
+
     /**
      * Get the links that belong to the submenu.
      *

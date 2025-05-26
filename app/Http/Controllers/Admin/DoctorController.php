@@ -14,8 +14,25 @@ class DoctorController extends Controller
     public function index()
     {
         abort_unless(Gate::allows('view.services') || Gate::allows('create.services'), 403);
-        $doctors = Doctor::all()->each->setAppends([]);
-        return view('admin.doctores.index', compact('doctors'));   
+        $search = \Request('search');
+
+        $doctors = Doctor::orderBy('created_at','DESC');;
+
+        $terms = explode(' ', $search);
+        $doctors = $doctors->where(function ($query) use ($terms) {
+            foreach ($terms as $term) {
+                $query->where(function ($q) use ($term) {
+                    $q->where('name', 'LIKE', '%'.$term.'%')
+                    ->orWhere('last_name', 'LIKE', '%'.$term.'%');
+                });
+            }
+        });
+
+        $doctors = $doctors->paginate(20);
+
+        $doctorsItems = Collect($doctors->items());
+
+        return view('admin.doctores.index', compact('doctors', 'doctorsItems'));   
     }
 
     public function save(DoctorRequest $request)
