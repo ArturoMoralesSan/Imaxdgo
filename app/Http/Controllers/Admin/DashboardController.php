@@ -177,7 +177,22 @@ class DashboardController extends Controller
                 });
 
 
-            return view('admin.dashboard-admin', compact('topGlobalDoctors','topGlobalDoctorsByBranch','branches','studiesCount','servicesPerPayments','expensesCount','ordersAll', 'servicesCount', 'CostbyServices','string_date', 'ingreso', 'gasto', 'days', 'branchesExpenses', 'expensesByType'));   
+                $DoctorsDIs = Doctor::withMax('services', 'created_at')
+                ->withCount('services')             // Agrega el conteo de servicios
+                ->orderBy('services_max_created_at', 'DESC')
+                ->take(10)
+                ->get()
+                ->map(function ($doctor) {
+                    return [
+                        'id' => $doctor->id,
+                        'name' => $doctor->name,
+                        'last_name' => $doctor->last_name,
+                        'last_service_date' => $doctor->last_service_date, // usa el accesor
+                    ];
+                });
+
+
+            return view('admin.dashboard-admin', compact('DoctorsDIs','topGlobalDoctors','topGlobalDoctorsByBranch','branches','studiesCount','servicesPerPayments','expensesCount','ordersAll', 'servicesCount', 'CostbyServices','string_date', 'ingreso', 'gasto', 'days', 'branchesExpenses', 'expensesByType'));   
             
         } 
     }

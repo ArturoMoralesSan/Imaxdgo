@@ -250,7 +250,7 @@
             
         </div>
         <div class="md:row">
-            <div class="md:col">
+            <div class="md:col-1/2">
                 <section class="db-panel">
                     <h3 class="db-panel__title">
                         Top 5 doctores
@@ -325,6 +325,32 @@
                             @endforeach
                         </template>
                     </tabs-component>
+
+                </section>
+            </div>
+
+            <div class="md:col-1/2">
+                <section class="db-panel">
+                    <h3 class="db-panel__title">
+                        Doctores con menor frecuencia de servicios
+                    </h3>
+                    <resource-table :breakpoint="800" :model="{{ $DoctorsDIs->values()->toJson() }}" inline-template>
+                        <table class="table size-caption mx-auto mb-16 md:table--responsive">
+                            <thead>
+                                <tr class="table-resource__headings">
+                                    <th>Doctor</th>
+                                    <th>Último Servicio</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="item in resourceList" class="table-resource__row" :key="item.id">
+                                    <td data-label="Doctor">@{{ item.name }} @{{ item.last_name }}</td>
+                                    <td data-label="Último Servicio">@{{ item.last_service_date }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </resource-table>
+
 
                 </section>
             </div>
