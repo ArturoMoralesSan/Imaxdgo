@@ -78,19 +78,16 @@ class PdfController extends Controller
         $dateNow    = Carbon::now();
         $dateFormat = $dateNow->format('Y-m-d');
 
-        $start_date = \Request('start_date') != null ? \Request('start_date') : $dateFormat;
-        $end_date   = \Request('end_date') != null ? \Request('end_date') : $dateFormat ;
-        
-        if (!Auth::user()->isSuperAdmin()) {
-            $start_date = \Request('start_date') != null ? \Request('start_date') : $dateFormat;
-            $end_date   = \Request('end_date') != null ? \Request('end_date') : $dateFormat ;
+        $start_date = \Request('start_date') ?? $dateFormat;
+        $end_date   = \Request('end_date') ?? $dateFormat;
 
+        if (!Auth::user()->isSuperAdmin()) {
             $branch_id = Auth::user()->branch_id;
         }
 
-        $servicesQuery = Service::with('doctor', 'studies', 'branch')
-        ->whereBetween('date', [$start_date, $end_date])
-        ->where('doctor_id', $id);
+        $servicesQuery = Service::with(['doctor', 'studies', 'branch'])
+            ->whereBetween('date', [$start_date, $end_date])
+            ->where('doctor_id', $id);
 
         if ($branch_id) {
             $servicesQuery->where('branch_id', $branch_id);
@@ -98,35 +95,55 @@ class PdfController extends Controller
 
         $services = $servicesQuery->get();
 
-        $allStudies = $services->flatMap(function ($service) {
-            return $service->studies;
+        $doctor = $services->first()?->doctor;
+        $doctorName = $doctor ? "{$doctor->name} {$doctor->last_name}" : 'No disponible';
+        $branchName = ($branch_id && $services->isNotEmpty()) ? $services->first()->branch->name : null;
+
+        // Lista plana: un renglón por estudio
+        $patients = $services->flatMap(function ($service) {
+            return $service->studies->map(function ($study) use ($service) {
+                return [
+                    'patient_name' => $service->patient,
+                    'study_name' => $study->name,
+                    'branch_name' => $service->branch->name ?? 'Sin sucursal',
+                ];
+            });
         });
 
-        $studiesCount = $allStudies
-            ->groupBy('name')
-            ->map(function ($group, $studyName) {
-                return [
-                    'study_name' => $studyName,
-                    'count' => $group->count(),
-                ];
-            })
+        // Conteo de estudios
+        $studiesCount = $patients
+            ->groupBy('study_name')
+            ->map(fn($group, $study) => ['study_name' => $study, 'count' => $group->count()])
             ->sortByDesc('count')
             ->values();
-            $doctor = $services->first()?->doctor;
-            $doctorName = $doctor ? "{$doctor->name} {$doctor->last_name}" : 'No disponible';
-            $branchName = ($branch_id && $services->isNotEmpty()) ? $services->first()->branch->name : null;
-            $totalServices = $services->count();
 
+        // Conteo por sucursal (por paciente único)
+        $branchesCount = $patients
+            ->groupBy('branch_name')
+            ->map(fn($group, $branch) => [
+                'branch_name' => $branch,
+                'count' => $group->unique('patient_name')->count()
+            ])
+            ->values();
 
+        // Último paciente
+        $lastService = $services->sortByDesc('date')->first();
+        $lastPatientDate = optional($lastService)->date ? Carbon::parse($lastService->date)->format('d/m/Y') : 'N/A';
+        $lastPatientBranch = optional($lastService->branch)->name ?? 'N/A';
 
-        $start_date = Carbon::createFromFormat('Y-m-d', $start_date)->format('d/m/Y');
-        $end_date   = Carbon::createFromFormat('Y-m-d', $end_date)->format('d/m/Y');
+        $totalServices = $services->count();
+        $start_date = Carbon::parse($start_date)->format('d/m/Y');
+        $end_date   = Carbon::parse($end_date)->format('d/m/Y');
 
-        $pdf = PDF::loadView('admin.pdf.doctorservices', compact('totalServices', 'doctorName', 'branchName','studiesCount', 'start_date', 'end_date'));
-        $pdf->setPaper('letter', 'portrait'); 
-        return $pdf->stream('reporte-ingresos-sucursal.pdf',['Attachment' => false]);
-        //return $pdf->download('reporte-ingresos-sucursal.pdf');   
+        $pdf = PDF::loadView('admin.pdf.doctorservices', compact(
+            'totalServices', 'doctorName', 'branchName', 'studiesCount', 'start_date', 'end_date',
+            'patients', 'branchesCount', 'lastPatientDate', 'lastPatientBranch'
+        ));
+
+        $pdf->setPaper('letter', 'portrait');
+        return $pdf->stream('reporte-ingresos-sucursal.pdf', ['Attachment' => false]);
     }
+
 
     public function pdfRace($id)
     {
