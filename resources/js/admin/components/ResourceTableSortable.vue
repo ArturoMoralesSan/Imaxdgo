@@ -8,8 +8,10 @@ export default {
             sortAsc: this.sortDir === 'asc',
         }
     },
+    
 
     methods: {
+
         sortByColumn(column) {
             let newSortDir = 'asc';
             if (this.sortKey === column) {
@@ -30,7 +32,15 @@ export default {
 
         isSorted(column) {
             return this.sortKey === column;
-        }
+        },
+        onResourceDelete(DeleteButton) {
+            const index = this.resourceList.map(item => item.id).indexOf(DeleteButton.resourceId);
+            if (index !== -1) {
+                this.resourceList.splice(index, 1);
+                DeleteButton.showSuccess();
+            }
+        },
+        
     }
 }
 
