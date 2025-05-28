@@ -253,38 +253,32 @@
             <div class="md:col-1/2">
                 <section class="db-panel">
                     <h3 class="db-panel__title">
-                        Top 5 doctores
+                        Top doctores
                     </h3>
-                    <tabs-component :tabs='{ "global": "Top 5 Global", "branch": "top 5 global por Sucursal" }' initial="global">
+                    <tabs-component :tabs='{ "global": "Top Global", "branch": "Top global por Sucursal" }' initial="global">
 
                         {{-- Panel: Top Global --}}
                         <template #panel-global>
+                            <lazy-resource-loader
+                                :items='@json($topGlobalDoctors)'
+                                :headings="['Doctor', 'Servicios', 'Acciones']"
+                                :chunk-size="5"
+                                :max-items="20"
+                            >
+                                <template #row="{ item }">
+                                    <td data-label="Doctor">@{{ item.name }}</td>
+                                    <td data-label="Servicios">@{{ item.total_services }}</td>
+                                    <td data-label="Acciones">
+                                        <link-pdf 
+                                            :branchid="item.id"
+                                            url="/admin/pdf-doctores/"
+                                            startdate="{{ request('start_date') }}"
+                                            enddate="{{ request('end_date') }}"
+                                        />
+                                    </td>
+                                </template>
+                            </lazy-resource-loader>
 
-                            <resource-table :breakpoint="800" :model="{{ $topGlobalDoctors->values()->toJson() }}" inline-template>
-                                <table class="table size-caption mx-auto mb-16 md:table--responsive">
-                                    <thead>
-                                        <tr class="table-resource__headings">
-                                            <th>Doctor</th>
-                                            <th>Cantidad de Servicios</th>
-                                            <th>Reporte</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="item in resourceList" class="table-resource__row" :key="item.id">
-                                            <td data-label="Doctor">@{{ item.name }}</td>
-                                            <td data-label="Cantidad">@{{ item.total_services }}</td>
-                                            <td data-label="Reporte:">
-                                                <link-pdf 
-                                                    :branchid="item.id"
-                                                    url="/admin/pdf-doctores/"
-                                                    startdate="{{ app('request')->input('start_date') }}"
-                                                    enddate="{{ app('request')->input('end_date') }}">
-                                                </link-pdf>                                   
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </resource-table>
                         </template>
 
                         {{-- Panel: Por Sucursal --}}
@@ -294,33 +288,25 @@
                                 <div class="mb-6">
                                     <h4 class="text-lg font-semibold mb-2">{{ $branchName }}</h4>
 
-                                    <resource-table :breakpoint="800" :model="{{ $doctors->values()->toJson() }}" inline-template>
-                                        <table class="table size-caption mx-auto mb-16 md:table--responsive">
-                                            <thead>
-                                                <tr class="table-resource__headings">
-                                                    <th>Doctor</th>
-                                                    <th>Cantidad de Servicios</th>
-                                                    <th>Reporte</th>
-
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr v-for="item in resourceList" class="table-resource__row" :key="item.id">
-                                                    <td data-label="Doctor">@{{ item.name }}</td>
-                                                    <td data-label="Cantidad">@{{ item.count_services }}</td>
-                                                    <td data-label="Reporte:">
-                                                        <link-pdfs 
-                                                            :branchid="item.branch_id"
-                                                            :doctorid="item.id" 
-                                                            url="/admin/pdf-doctores/"
-                                                            startdate="{{ app('request')->input('start_date') }}"
-                                                            enddate="{{ app('request')->input('end_date') }}">
-                                                        </link-pdfs>                                   
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </resource-table>
+                                    <lazy-resource-loader
+                                        :items='@json($doctors)'
+                                        :headings="['Doctor', 'Servicios', 'Acciones']"
+                                        :chunk-size="5"
+                                        :max-items="30"
+                                    >
+                                        <template #row="{ item }">
+                                            <td data-label="Doctor">@{{ item.name }}</td>
+                                            <td data-label="Servicios">@{{ item.count_services }}</td>
+                                            <td data-label="Acciones">
+                                                <link-pdf 
+                                                    :branchid="item.id"
+                                                    url="/admin/pdf-doctores/"
+                                                    startdate="{{ request('start_date') }}"
+                                                    enddate="{{ request('end_date') }}"
+                                                />
+                                            </td>
+                                        </template>
+                                    </lazy-resource-loader>
                                 </div>
                             @endforeach
                         </template>
@@ -334,24 +320,17 @@
                     <h3 class="db-panel__title">
                         Doctores con menor frecuencia de servicios
                     </h3>
-                    <resource-table :breakpoint="800" :model="{{ $DoctorsDIs->values()->toJson() }}" inline-template>
-                        <table class="table size-caption mx-auto mb-16 md:table--responsive">
-                            <thead>
-                                <tr class="table-resource__headings">
-                                    <th>Doctor</th>
-                                    <th>Último Servicio</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="item in resourceList" class="table-resource__row" :key="item.id">
-                                    <td data-label="Doctor">@{{ item.name }} @{{ item.last_name }}</td>
-                                    <td data-label="Último Servicio">@{{ item.last_service_date }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </resource-table>
-
-
+                    <lazy-resource-loader
+                        :items='@json($DoctorsDIs)'
+                        :headings="['Doctor', 'Último servicio']"
+                        :chunk-size="5"
+                        :max-items="30"
+                    >
+                        <template #row="{ item }">
+                            <td data-label="Doctor">@{{ item.name }} @{{ item.last_name }}</td>
+                            <td data-label="Último servicio">@{{ item.last_service_date }}</td>
+                        </template>
+                    </lazy-resource-loader>
                 </section>
             </div>
         </div>
