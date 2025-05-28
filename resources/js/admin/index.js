@@ -30,6 +30,10 @@ import SelectFilter from './components/SelectFilter.vue';
 import LinkPdf from './components/LinkPdf.vue';
 import LinkPdfs from './components/LinkPdfs.vue';
 
+import LazyResourceLoader from './components/LazyResourceLoader.vue';
+
+import ResourceTableSortable from './components/ResourceTableSortable.vue';
+
 
 (function() {
     /* Base components
@@ -65,6 +69,8 @@ import LinkPdfs from './components/LinkPdfs.vue';
     Vue.component('service-registration-form', ServiceRegistrationForm);
     Vue.component('link-pdf', LinkPdf);
     Vue.component('link-pdfs', LinkPdfs);
+    Vue.component('lazy-resource-loader', LazyResourceLoader);
+    Vue.component('resource-table-sortable', ResourceTableSortable);
 
 
     const vm = new Vue({
