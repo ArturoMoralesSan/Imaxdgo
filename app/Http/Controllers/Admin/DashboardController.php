@@ -142,6 +142,7 @@ class DashboardController extends Controller
             ->get()
             ->filter(fn($service) => $service->doctor !== null);
 
+            // --- Top Global ---
             $topGlobalDoctors = $servicesData
             ->groupBy('doctor.id')
             ->map(function ($services) {
@@ -154,17 +155,14 @@ class DashboardController extends Controller
                 ];
             })
             ->sortByDesc('total_services')
-            ->take(5);
+            ->take(30)
+            ->values();
 
-            $doctorIds = $topGlobalDoctors->pluck('id');
-
+            // --- Top por cada sucursal ---
             $topGlobalDoctorsByBranch = $servicesData
-                ->filter(fn($service) => $doctorIds->contains($service->doctor_id))
-                ->groupBy(function ($service) {
-                    return $service->branch->name;
-                })
+                ->groupBy(fn($service) => $service->branch->name)
                 ->map(function ($servicesInBranch) {
-                    return $servicesInBranch->groupBy('doctor.id')
+                    $doctorsGrouped = $servicesInBranch->groupBy('doctor.id')
                         ->map(function ($servicesByDoctor) {
                             $doctor = $servicesByDoctor->first()->doctor;
                             return [
@@ -174,22 +172,25 @@ class DashboardController extends Controller
                                 'branch_id' => $servicesByDoctor->first()->branch->id,
                             ];
                         });
+                    return $doctorsGrouped->sortByDesc('count_services')->take(30)->values();
                 });
 
-
-                $DoctorsDIs = Doctor::withMax('services', 'created_at')
-                ->withCount('services')             // Agrega el conteo de servicios
-                ->orderBy('services_max_created_at', 'DESC')
-                ->take(10)
+                $DoctorsDIs = Doctor::whereHas('services') // Solo los que tienen servicios
+                ->withMax('services', 'created_at') // Trae la fecha del último servicio
+                ->withCount('services')
+                ->orderBy('services_max_created_at', 'ASC') // Ordena de más viejo a más reciente
+                ->take(30)
                 ->get()
                 ->map(function ($doctor) {
                     return [
                         'id' => $doctor->id,
                         'name' => $doctor->name,
                         'last_name' => $doctor->last_name,
-                        'last_service_date' => $doctor->last_service_date, // usa el accesor
+                        'last_service_date' => $doctor->last_service_date, // accesor si lo tienes
                     ];
                 });
+
+
 
 
             return view('admin.dashboard-admin', compact('DoctorsDIs','topGlobalDoctors','topGlobalDoctorsByBranch','branches','studiesCount','servicesPerPayments','expensesCount','ordersAll', 'servicesCount', 'CostbyServices','string_date', 'ingreso', 'gasto', 'days', 'branchesExpenses', 'expensesByType'));   
