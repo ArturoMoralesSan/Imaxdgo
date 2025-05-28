@@ -93,9 +93,10 @@ class ServiceController extends Controller
             $branches = Branch::pluck('name','id');
         }
 
-        $doctors = Doctor::all()->mapWithKeys(function ($doctor) {
+        $doctors = Doctor::orderBy('last_name', 'asc')->get()
+        ->mapWithKeys(function ($doctor) {
             return [$doctor->id => $doctor->name . ' ' . $doctor->last_name];
-        });        
+        })->toArray();    
         $payments = Payment::pluck('name','id');
         $studies  = Study::pluck('name','id');
         return view('admin.servicios.crear', compact('doctors','branches', 'studies', 'payments'));   
@@ -109,9 +110,10 @@ class ServiceController extends Controller
         } else {
             $branches = Branch::pluck('name','id');
         }  
-        $doctors = Doctor::all()->mapWithKeys(function ($doctor) {
+        $doctors = Doctor::orderBy('last_name', 'asc')->get()
+        ->mapWithKeys(function ($doctor) {
             return [$doctor->id => $doctor->name . ' ' . $doctor->last_name];
-        });      
+        })->toArray();    
         $payments = Payment::pluck('name','id');
         $studies = Study::pluck('name','id');
         $service = Service::find($id);

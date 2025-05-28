@@ -27,7 +27,7 @@
             :study="4"
             :min-study="1"
             :branches="{{ $branches }}"
-            :doctors="{{ $doctors }}"
+            :doctors="{{ json_encode($doctors, JSON_FORCE_OBJECT) }}"
             :studies-data="{{ $studies }}"
             :assigned-studies="{{ $assigned_studies }}"
             :service-data="{{ $service }}"
