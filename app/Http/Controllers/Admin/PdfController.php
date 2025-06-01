@@ -7,10 +7,11 @@ use Illuminate\Http\Request;
 use PDF;
 use App\Models\Service;
 use App\Models\Expense;
+use App\Models\Doctor;
 use Carbon\Carbon;
 use Auth;
 use App\Models\RaceRegistration;
-
+use Illuminate\Support\Facades\DB;
 use Luecano\NumeroALetras\NumeroALetras;
 
 class PdfController extends Controller
@@ -72,6 +73,159 @@ class PdfController extends Controller
         return $pdf->stream('reporte-ingresos-sucursal.pdf',['Attachment' => false]);
         //return $pdf->download('reporte-ingresos-sucursal.pdf');   
     }
+
+
+   public function pdfDoctor($id)
+    {
+        $start_date = \Request('start_date');
+        $end_date   = \Request('end_date');
+
+        $servicesQuery = Service::with(['doctor', 'studies', 'branch'])
+            ->where('doctor_id', $id);
+
+        // Solo aplica el filtro de fechas si ambas están presentes
+        if ($start_date && $end_date) {
+            $servicesQuery->whereBetween('date', [$start_date, $end_date]);
+        }
+
+        $services = $servicesQuery->get();
+
+        $doctor = $services->first()?->doctor;
+        $doctorName = $doctor ? "{$doctor->name} {$doctor->last_name}" : 'No disponible';
+
+        // Lista plana: un renglón por estudio
+        $patients = $services->flatMap(function ($service) {
+            return $service->studies->map(function ($study) use ($service) {
+                return [
+                    'patient_name' => $service->patient,
+                    'study_name' => $study->name,
+                    'branch_name' => $service->branch->name ?? 'Sin sucursal',
+                ];
+            });
+        });
+
+        // Conteo de estudios
+        $studiesCount = $patients
+            ->groupBy('study_name')
+            ->map(fn($group, $study) => ['study_name' => $study, 'count' => $group->count()])
+            ->sortByDesc('count')
+            ->values();
+
+        // Conteo por sucursal (por paciente único)
+        $branchesCount = $patients
+            ->groupBy('branch_name')
+            ->map(fn($group, $branch) => [
+                'branch_name' => $branch,
+                'count' => $group->unique('patient_name')->count()
+            ])
+            ->values();
+
+        // Último paciente
+        $lastService = $services->sortByDesc('date')->first();
+        $lastPatientDate = optional($lastService)->date ? Carbon::parse($lastService->date)->format('d/m/Y') : 'N/A';
+        $lastPatientBranch = optional($lastService->branch)->name ?? 'N/A';
+
+        $totalServices = $services->count();
+
+        // Formatea fechas solo si existen
+        $start_date = $start_date ? Carbon::parse($start_date)->format('d/m/Y') : null;
+        $end_date   = $end_date ? Carbon::parse($end_date)->format('d/m/Y') : null;
+
+        $pdf = PDF::loadView('admin.pdf.doctorservice', compact(
+            'totalServices', 'doctorName', 'studiesCount', 'start_date', 'end_date',
+            'patients', 'branchesCount', 'lastPatientDate', 'lastPatientBranch'
+        ));
+
+        $pdf->setPaper('letter', 'portrait');
+        return $pdf->stream('reporte-doctor.pdf', ['Attachment' => false]);
+    }
+
+
+    public function exportDoctorPdf(Request $request)
+    {
+        $search     = $request->input('search');
+        $sortKey    = $request->input('sort_by', 'last_name');
+        $sortAsc    = $request->input('sort_dir', 'asc');
+        $start_date = $request->input('start_date');
+        $end_date   = $request->input('end_date');
+
+        $query = Doctor::query();
+
+        // Subconsulta para la última fecha de servicio
+        $lastServiceDateSubquery = DB::table('services')
+            ->select('created_at')
+            ->whereColumn('services.doctor_id', 'doctors.id')
+            ->when($start_date && $end_date, function ($sub) use ($start_date, $end_date) {
+                $sub->whereBetween('created_at', [$start_date, $end_date]);
+            })
+            ->orderBy('created_at', 'desc')
+            ->limit(1);
+
+        // Subconsulta para contar servicios
+        $countServicesSubquery = DB::table('services')
+            ->selectRaw('COUNT(*)')
+            ->whereColumn('services.doctor_id', 'doctors.id')
+            ->when($start_date && $end_date, function ($sub) use ($start_date, $end_date) {
+                $sub->whereBetween('created_at', [$start_date, $end_date]);
+            });
+
+        $query->select('doctors.*')
+            ->addSelect([
+                'last_service_date_raw' => $lastServiceDateSubquery,
+                'count_services_raw' => $countServicesSubquery,
+            ]);
+
+        // Filtro por fecha: mostrar solo doctores con servicios en el rango
+        if ($start_date && $end_date) {
+            $query->whereExists(function ($sub) use ($start_date, $end_date) {
+                $sub->select(DB::raw(1))
+                    ->from('services')
+                    ->whereColumn('services.doctor_id', 'doctors.id')
+                    ->whereBetween('created_at', [$start_date, $end_date]);
+            });
+        }
+
+        // Filtro de búsqueda
+        if ($search) {
+            $terms = explode(' ', $search);
+            $query->where(function ($q) use ($terms) {
+                foreach ($terms as $term) {
+                    $q->where(function ($q2) use ($term) {
+                        $q2->where('name', 'LIKE', '%'.$term.'%')
+                            ->orWhere('last_name', 'LIKE', '%'.$term.'%');
+                    });
+                }
+            });
+        }
+
+        // Ordenamiento
+        if ($sortKey === 'last_service_date') {
+            $query->orderBy('last_service_date_raw', $sortAsc);
+        } elseif ($sortKey === 'count_services') {
+            $query->orderBy('count_services_raw', $sortAsc);
+        } else {
+            $query->orderBy($sortKey, $sortAsc);
+        }
+
+        // Ejecutar consulta
+        $doctors = $query->get();
+
+        // Separar en dos colecciones
+        $withServices = $doctors->filter(fn($d) => $d->count_services_raw > 0);
+        $withoutServices = $doctors->filter(fn($d) => $d->count_services_raw == 0);
+
+        // Generar PDF
+        return Pdf::loadView('admin.pdf.exportdoctors', [
+            'withServices'     => $withServices,
+            'withoutServices'  => $withoutServices,
+            'start_date'       => $start_date,
+            'end_date'         => $end_date,
+            'search'           => $search,
+            'sort_by'          => $sortKey,
+            'sort_dir'         => $sortAsc,
+        ])->stream('reporte_doctores.pdf');
+    }
+
 
     public function pdfDoctors($id, $branch_id = null)
     {
