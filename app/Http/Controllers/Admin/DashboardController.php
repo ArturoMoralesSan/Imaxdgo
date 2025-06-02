@@ -175,20 +175,23 @@ class DashboardController extends Controller
                     return $doctorsGrouped->sortByDesc('count_services')->take(30)->values();
                 });
 
-                $DoctorsDIs = Doctor::whereHas('services') // Solo los que tienen servicios
-                ->withMax('services', 'created_at') // Trae la fecha del último servicio
-                ->withCount('services')
-                ->orderBy('services_max_created_at', 'ASC') // Ordena de más viejo a más reciente
-                ->take(30)
+                $DoctorsDIs = Doctor::withCount('services')
+                ->withMax('services', 'created_at') // services_max_created_at (puede ser null)
                 ->get()
                 ->map(function ($doctor) {
                     return [
                         'id' => $doctor->id,
                         'name' => $doctor->name,
                         'last_name' => $doctor->last_name,
-                        'last_service_date' => $doctor->last_service_date, // accesor si lo tienes
+                        'last_service_date' => $doctor->last_service_date, // Usa tu accessor
+                        'days_without_service' => $doctor->services_max_created_at
+                            ? Carbon::parse($doctor->services_max_created_at)->diffInDays(now())
+                            : PHP_INT_MAX, // Para que los que nunca han enviado queden arriba
                     ];
-                });
+                })
+                ->sortByDesc('days_without_service') // Ordena del que más días lleva sin enviar
+                ->take(60)
+                ->values();
 
 
 
