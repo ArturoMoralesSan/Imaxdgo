@@ -91,6 +91,23 @@
                                 </div>
                             </div>
                         </div>
+                        @if($doctor->branch_id == null)
+                            <div class="md:row mb-4">
+                                <div class="md:col-1/2">
+                                    {{-- nombres --}}
+                                    <div class="form-control">
+                                        <label for="branches">Sucursal</label>
+                                        <select-field class="form-select" name="branch_id" v-model="fields.branch_id"
+                                            :options="{{ $branches }}"
+                                            >
+                                        </select-field>
+                                        <field-errors name="branch_id"></field-errors>
+
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+
                     </section>
 
                     <div class="text-center">

@@ -134,6 +134,10 @@
                                 </th>
 
                                 <th>
+                                    Agregado por
+                                </th>
+
+                                <th>
                                     Reporte 
                                 </th>
                                 <th class="pr-4">Acciones</th>
@@ -149,6 +153,7 @@
                                 <td data-label="Teléfono">@{{ doctorsItem.tel }}</td>
                                 <td data-label="Cantidad de servicios">@{{ doctorsItem.count_services }}</td>
                                 <td data-label="Último servicio">@{{ doctorsItem.last_service_date }}</td>
+                                <td data-label="Agregado por">@{{ doctorsItem.added_by_branch_name }}</td>
                                 <td data-label="Reporte">
                                     <link-pdf 
                                         v-if="doctorsItem.last_service_date !== 'No ha enviado'"

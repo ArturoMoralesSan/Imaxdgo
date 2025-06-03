@@ -5,10 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Doctor;
+use App\Models\Branch;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\DoctorRequest;
 use Illuminate\Support\Str;
-
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 
@@ -49,6 +50,10 @@ class DoctorController extends Controller
                 'last_service_date_raw' => $lastServiceDateSubquery,
                 'count_services_raw' => $countServicesSubquery,
             ]);
+
+        $query->leftJoin('branches', 'doctors.branch_id', '=', 'branches.id')
+      ->addSelect('branches.name as branch_name');
+
 
         // Filtro por fecha: mostrar solo doctores con servicios en el rango
         if ($start_date && $end_date) {
@@ -97,12 +102,12 @@ class DoctorController extends Controller
 
 
 
-
-
     public function save(DoctorRequest $request)
     {
         abort_unless(Gate::allows('view.services') || Gate::allows('edit.services'), 403);
-        
+
+        $branchId = Auth::user()->branch_id;  
+
         $doctor = new Doctor;
         $doctor->name = $request->name;
         $doctor->last_name = $request->last_name;
@@ -110,6 +115,7 @@ class DoctorController extends Controller
         $doctor->cp = $request->cp;
         $doctor->email = $request->email;
         $doctor->tel = $request->tel;
+        $doctor->branch_id = $branchId;
         $doctor->save();
 
         alert('Se ha agregado un doctor.');
@@ -122,8 +128,9 @@ class DoctorController extends Controller
     public function edit($id)
     {
         abort_unless(Gate::allows('view.services') || Gate::allows('edit.services'), 403);
+        $branches = Branch::pluck('name','id');
         $doctor = Doctor::find($id);
-        return view('admin.doctores.editar', compact('doctor'));
+        return view('admin.doctores.editar', compact('doctor', 'branches'));
     }
 
 
@@ -138,6 +145,12 @@ class DoctorController extends Controller
         $doctor->cp = $request->cp;
         $doctor->email = $request->email;
         $doctor->tel = $request->tel;
+
+        if($doctor->branch_id == null)
+        {
+            $doctor->branch_id = $request->branch_id;
+        }
+
         $doctor->save();
 
         alert('Se ha actualizado un doctor.');

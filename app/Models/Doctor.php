@@ -12,7 +12,7 @@ class Doctor extends Model
     use HasFactory;
 
     
-    protected $appends = ['count_services', 'last_service_date'];
+    protected $appends = ['count_services', 'last_service_date', 'added_by_branch_name'];
 
 
     public function getCountServicesAttribute() {
@@ -30,6 +30,11 @@ class Doctor extends Model
         return 'No ha enviado';
     }
 
+    public function getAddedByBranchNameAttribute()
+    {
+        return $this->branch_name ?? 'No asignado';
+    }
+
     /**
      * Get the links that belong to the submenu.
      *
@@ -38,5 +43,10 @@ class Doctor extends Model
     public function services()
     {
         return $this->hasMany(Service::class);
+    }
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
     }
 }

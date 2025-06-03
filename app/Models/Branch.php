@@ -52,4 +52,11 @@ class Branch extends Model
     {
         return $this->hasMany(RaceRegistration::class);
     }
+
+    public function doctors()
+    {
+        return $this->hasMany(Doctor::class);
+    }
+    
+
 }
