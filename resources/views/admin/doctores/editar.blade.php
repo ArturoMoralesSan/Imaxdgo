@@ -102,7 +102,6 @@
                                             >
                                         </select-field>
                                         <field-errors name="branch_id"></field-errors>
-
                                     </div>
                                 </div>
                             </div>

@@ -71,8 +71,8 @@ class DoctorController extends Controller
             $query->where(function ($q) use ($terms) {
                 foreach ($terms as $term) {
                     $q->where(function ($q2) use ($term) {
-                        $q2->where('name', 'LIKE', '%'.$term.'%')
-                            ->orWhere('last_name', 'LIKE', '%'.$term.'%');
+                        $q2->where('doctors.name', 'LIKE', '%'.$term.'%')
+                            ->orWhere('doctors.last_name', 'LIKE', '%'.$term.'%');
                     });
                 }
             });
