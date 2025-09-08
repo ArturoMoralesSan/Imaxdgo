@@ -19,16 +19,28 @@ class UserController extends Controller
 
     public function index()
     {
-       abort_unless(Gate::allows('view.users') || Gate::allows('create.users'), 403);
+        abort_unless(Gate::allows('view.roles') || Gate::allows('create.roles'), 403);
 
-        $users = User::with('role', 'branch')->get();
+        $users = User::with([
+            'role:id,name',
+            'branch' => function ($query) {
+                $query->select('id', 'name');
+            }
+        ])->get();
+
+        $users->each(function ($user) {
+            $user->setAppends([]);
+            if ($user->relationLoaded('branch') && $user->branch) {
+                $user->branch->setAppends([]);
+            }
+        });
 
         return view('admin.usuarios.index', compact('users'));
     }
 
     public function create()
     {
-        abort_unless(Gate::allows('view.users') || Gate::allows('create.users'), 403);
+        abort_unless(Gate::allows('view.roles') || Gate::allows('create.roles'), 403);
 
         $roles = Role::pluck('name','id');
         $branches = Branch::pluck('name','id');
@@ -39,7 +51,7 @@ class UserController extends Controller
 
     public function save(UserAdminRequest $request)
     {
-        abort_unless(Gate::allows('view.users') || Gate::allows('create.users'), 403);
+        abort_unless(Gate::allows('view.roles') || Gate::allows('create.roles'), 403);
 
         $password        = $request->password;
         $user            = new User;
@@ -61,7 +73,7 @@ class UserController extends Controller
 
     public function edit($id)
     {
-        abort_unless(Gate::allows('view.users') || Gate::allows('create.users'), 403);
+        abort_unless(Gate::allows('view.roles') || Gate::allows('create.roles'), 403);
 
         $user     = User::find($id);
         $roles    = Role::pluck('name','id');
@@ -72,7 +84,7 @@ class UserController extends Controller
 
     public function update(UserAdminRequest $request, $id)
     {
-        abort_unless(Gate::allows('view.users') || Gate::allows('create.users'), 403);
+        abort_unless(Gate::allows('view.roles') || Gate::allows('create.roles'), 403);
 
         $user      = User::find($id);
 
@@ -96,7 +108,7 @@ class UserController extends Controller
 
     public function destroy($id)
     {
-        abort_unless(Gate::allows('view.users') || Gate::allows('create.users'), 403);
+        abort_unless(Gate::allows('view.roles') || Gate::allows('create.roles'), 403);
 
         if (Auth::user()->id !== $id) {
             $user = User::find($id);

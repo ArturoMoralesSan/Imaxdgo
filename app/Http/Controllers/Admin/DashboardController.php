@@ -111,10 +111,22 @@ class DashboardController extends Controller
 
             $expensesByType = TypeExpense::join('expenses', 'expenses.type_expense_id', '=', 'type_expenses.id')
                 ->whereBetween('expenses.date', [$start_date, $end_date])
-                ->groupBy('type_expenses.id')
-                ->select('type_expenses.*', DB::raw('SUM(expenses.amount) as expenses_sum_amount'))
+                ->groupBy(
+                    'type_expenses.id',
+                    'type_expenses.name',
+                    'type_expenses.created_at',
+                    'type_expenses.updated_at'
+                )
+                ->select(
+                    'type_expenses.id',
+                    'type_expenses.name',
+                    'type_expenses.created_at',
+                    'type_expenses.updated_at',
+                    DB::raw('SUM(expenses.amount) as expenses_sum_amount')
+                )
                 ->orderBy('expenses_sum_amount', 'desc')
                 ->get();
+
             
             
             $expensesByType->transform(function ($type) {
