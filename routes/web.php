@@ -19,8 +19,7 @@ use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Admin\PdfController;
 use App\Http\Controllers\Admin\RaceController;
 use App\Http\Controllers\Admin\RaceRegistrationController;
-
-
+use App\Http\Controllers\Admin\DeleteHistoryController;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -69,6 +68,11 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], functio
     //Password
     Route::view('perfil/cambiar-contrasena', 'admin.cambiar-contrasena');
     Route::post('perfil/cambiar-contrasena', [PasswordController::class, 'update']);
+
+    Route::get('peticiones', [DeleteHistoryController::class, 'index']);
+    Route::post('peticiones/aprobar/{id}', [DeleteHistoryController::class, 'approve']);
+    Route::get('solicitud-eliminar/{id}/{tipo}', [DeleteHistoryController::class, 'requestDelete']);
+    Route::post('solicitud-eliminar/{id}/{tipo}', [DeleteHistoryController::class, 'requestDeleteSend']);
 
     // usuarios
     Route::get('usuarios', [UserController::class, 'index']);

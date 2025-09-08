@@ -19,6 +19,7 @@ class ServiceController extends Controller
     public function index()
     {
         abort_unless(Gate::allows('view.services') || Gate::allows('create.services'), 403);
+        $admin = Auth::user()->isSuperAdmin();
         $actual_month = Carbon::now()->month;
         $actual_year  = Carbon::now()->year;
 
@@ -80,7 +81,7 @@ class ServiceController extends Controller
         $servicesItems = Collect($services->items());
 
 
-        return view('admin.servicios.index', compact('services', 'servicesItems', 'years', 'months', 'actual_month', 'actual_year')); 
+        return view('admin.servicios.index', compact('admin', 'services', 'servicesItems', 'years', 'months', 'actual_month', 'actual_year')); 
     }
 
     public function create()

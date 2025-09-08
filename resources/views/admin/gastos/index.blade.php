@@ -57,7 +57,7 @@
                                     @{{ expensesItem.type_expense.name }}
                                 </td>
                                 <td data-label="Costo:">
-                                    @{{ expensesItem.amount }}
+                                   $ @{{ expensesItem.amount }}
                                 </td>
 
                                 <td class="table-resource__actions" data-label="Acciones:">
@@ -65,13 +65,49 @@
                                         <img class="svg-icon" src="{{ url('img/svg/edit.svg')}}">
                                         Editar
                                     </a>
-                                    <delete-button class="btn--danger table-resource__button" :url="$root.path + '/admin/gastos/eliminar/' + expensesItem.id"
-                                        :resource-id="expensesItem.id"
-                                        :options="{ onDelete: onResourceDelete }"
-                                    >
-                                        <img class="svg-icon" src="{{ url('img/svg/trash.svg')}}">
-                                        Eliminar
-                                    </delete-button>
+                                    @if($admin)
+                                        <delete-button 
+                                            class="btn--danger table-resource__button" 
+                                            :url="$root.path + '/admin/gastos/eliminar/' + expensesItem.id"
+                                            :resource-id="expensesItem.id"
+                                            :options="{ onDelete: onResourceDelete }"
+                                        >
+                                            <img class="svg-icon" src="{{ url('img/svg/trash.svg')}}">
+                                            Eliminar
+                                        </delete-button>
+                                    @else
+                                        <div v-if="expensesItem.delete_requested == 0">
+                                            <form :action="$root.path + '/admin/solicitud-eliminar/' + expensesItem.id + '/gasto/'" method="POST">
+                                                @csrf
+                                                <button type="submit" class="btn btn--sm btn--primary table-resource__button">
+                                                    <img class="svg-icon" src="{{ url('img/svg/request.svg')}}">
+                                                    Solicitar eliminar
+                                                </button>
+                                            </form>
+                                        </div>
+
+                                        <div v-if="expensesItem.delete_requested == 1 && expensesItem.delete_approved == 0">
+                                            <span class="badge badge--pendiente">
+                                                <img class="svg-icon" src="{{ url('img/svg/pendding.svg')}}">
+                                                Pendiente de aprobación
+                                            </span>
+                                        </div>
+
+                                        <div v-if="expensesItem.delete_requested == 1 && expensesItem.delete_approved == 1">
+                                            <delete-button 
+                                                class="btn--danger table-resource__button" 
+                                                :url="$root.path + '/admin/gastos/eliminar/' + expensesItem.id"
+                                                :resource-id="expensesItem.id"
+                                                :options="{ onDelete: onResourceDelete }"
+                                            >
+                                                <img class="svg-icon" src="{{ url('img/svg/trash.svg')}}">
+                                                Eliminar
+                                            </delete-button>
+                                        </div>
+
+                                    @endif
+                                </td>
+                                    
                                 </td>
                             </tr>
                         </tbody>

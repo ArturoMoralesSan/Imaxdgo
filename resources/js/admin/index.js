@@ -33,6 +33,7 @@ import LinkPdfs from './components/LinkPdfs.vue';
 import LazyResourceLoader from './components/LazyResourceLoader.vue';
 
 import ResourceTableSortable from './components/ResourceTableSortable.vue';
+import AproveButton from './components/AproveButton.vue';
 
 
 (function() {
@@ -71,6 +72,7 @@ import ResourceTableSortable from './components/ResourceTableSortable.vue';
     Vue.component('link-pdfs', LinkPdfs);
     Vue.component('lazy-resource-loader', LazyResourceLoader);
     Vue.component('resource-table-sortable', ResourceTableSortable);
+    Vue.component('approve-button', AproveButton);
 
 
     const vm = new Vue({

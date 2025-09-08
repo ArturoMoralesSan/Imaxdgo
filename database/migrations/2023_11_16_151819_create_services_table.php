@@ -29,6 +29,8 @@ class CreateServicesTable extends Migration
             $table->date('date');
             $table->foreign('branch_id')->references('id')->on('branches')->onDelete('cascade');
             $table->foreign('payment_id')->references('id')->on('payments')->onDelete('cascade');
+            $table->boolean('delete_requested')->default(false);
+            $table->boolean('delete_approved')->default(false);
             $table->timestamps();
         });
     }

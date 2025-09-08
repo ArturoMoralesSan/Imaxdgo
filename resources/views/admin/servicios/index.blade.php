@@ -124,13 +124,47 @@
                                         <img class="svg-icon" src="{{ url('img/svg/edit.svg')}}">
                                         Editar
                                     </a>
-                                    <delete-button class="btn--danger table-resource__button" :url="$root.path + '/admin/servicios/eliminar/' + serviceItem.id"
-                                        :resource-id="serviceItem.id"
-                                        :options="{ onDelete: onResourceDelete }"
-                                    >
-                                        <img class="svg-icon" src="{{ url('img/svg/trash.svg')}}">
-                                        Eliminar
-                                    </delete-button>
+                                    @if($admin)
+                                        <delete-button 
+                                            class="btn--danger table-resource__button" 
+                                            :url="$root.path + '/admin/gastos/eliminar/' + serviceItem.id"
+                                            :resource-id="serviceItem.id"
+                                            :options="{ onDelete: onResourceDelete }"
+                                        >
+                                            <img class="svg-icon" src="{{ url('img/svg/trash.svg')}}">
+                                            Eliminar
+                                        </delete-button>
+                                    @else
+                                        <div v-if="serviceItem.delete_requested == 0">
+                                            <form :action="$root.path + '/admin/solicitud-eliminar/' + serviceItem.id + '/servicio/'" method="POST">
+                                                @csrf
+                                                <button type="submit" class="btn btn--sm btn--primary table-resource__button">
+                                                    <img class="svg-icon" src="{{ url('img/svg/request.svg')}}">
+                                                    Solicitar eliminar
+                                                </button>
+                                            </form>
+                                        </div>
+
+                                        <div v-if="serviceItem.delete_requested == 1 && serviceItem.delete_approved == 0">
+                                            <span class="badge badge--pendiente">
+                                                <img class="svg-icon" src="{{ url('img/svg/pendding.svg')}}">
+                                                Pendiente de aprobación
+                                            </span>
+                                        </div>
+
+                                        <div v-if="serviceItem.delete_requested == 1 && serviceItem.delete_approved == 1">
+                                            <delete-button 
+                                                class="btn--danger table-resource__button" 
+                                                :url="$root.path + '/admin/gastos/eliminar/' + serviceItem.id"
+                                                :resource-id="serviceItem.id"
+                                                :options="{ onDelete: onResourceDelete }"
+                                            >
+                                                <img class="svg-icon" src="{{ url('img/svg/trash.svg')}}">
+                                                Eliminar
+                                            </delete-button>
+                                        </div>
+
+                                    @endif
                                 </td>
                             </tr>
                         </tbody>

@@ -20,9 +20,11 @@ class ExpenseController extends Controller
         abort_unless(Gate::allows('view.expenses') || Gate::allows('create.expenses'), 403);
         
         $expenses = Expense::with('branch','type_expense')->orderBy('id', 'DESC');
+        $admin = Auth::user()->isSuperAdmin();
         if (!Auth::user()->isSuperAdmin()) {
             $expenses = $expenses->where('branch_id', Auth::user()->branch_id);
         } 
+
         $expenses = $expenses->paginate(10);
 
         $expenses->getCollection()->transform(function ($expense) {
@@ -30,8 +32,10 @@ class ExpenseController extends Controller
             return $expense;
         });
 
+
         $expensesItems = Collect($expenses->items());
-        return view('admin.gastos.index', compact('expenses', 'expensesItems'));   
+        
+        return view('admin.gastos.index', compact('admin','expenses', 'expensesItems'));   
     }
 
     public function create()
