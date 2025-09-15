@@ -72,6 +72,9 @@
                                 <td data-label="Solicitado:">
                                     @{{ requestItem.deleted_by }}
                                 </td>
+                                <td data-label="Fecha:">
+                                    @{{ requestItem.formated_date }}
+                                </td>
                                 <td class="table-resource__actions" data-label="Acciones:">
                                     <approve-button 
                                         v-if="requestItem.status == 'pendiente'"

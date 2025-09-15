@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Mail\SolicitudEliminarRegistroMail;
+use Illuminate\Support\Facades\Mail;
 use App\Models\DeleteHistory;
 use App\Models\Expense;
 use App\Models\Service;
@@ -11,6 +13,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Auth;
+
 
 class DeleteHistoryController extends Controller
 {
@@ -44,6 +47,7 @@ class DeleteHistoryController extends Controller
     public function requestDelete($id, $tipo)
     {
         abort_unless(Gate::allows('view.expenses') || Gate::allows('create.expenses'), 403);
+        
         if ($tipo == 'gasto') {
             $data = Expense::with('branch')->where('id',$id)->first();
             $data->display_name = $data->person_name;
@@ -80,6 +84,10 @@ class DeleteHistoryController extends Controller
         $delete->value = $amount;
         $delete->deleted_by = Auth::user()->name . ' ' . Auth::user()->last_name;
         $delete->save();
+
+        $destinatario = 'adrianterronesg@gmail.com';
+
+        Mail::to($destinatario)->send(new SolicitudEliminarRegistroMail($delete));
 
         if ($tipo == 'gasto') {
             return response('', 204, [
