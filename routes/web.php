@@ -42,6 +42,7 @@ Route::get('{provider}/callback', [LoginController::class,'handleProviderCallbac
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::get('notas/{id}', [PdfController::class, 'pdfnote']);
+Route::get('aprobar-solicitudes/{id}', [DeleteHistoryController::class, 'approveEmail']);
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], function() {
     Route::get('/', [DashboardController::class, 'index']);

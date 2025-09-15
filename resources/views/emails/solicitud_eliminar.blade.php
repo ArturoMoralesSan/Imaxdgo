@@ -150,11 +150,24 @@
                             <li><strong>Tipo:</strong> {{ $delete->type }}</li>
                             <li><strong>Sucursal:</strong> {{ $delete->branch }}</li>
                             <li><strong>Razón:</strong> {{ $delete->reason }}</li>
-                            <li><strong>Monto:</strong> {{ $delete->value }}</li>
+                            <li><strong>Monto:</strong> ${{ $delete->value }}</li>
                             <li><strong>Solicitado por:</strong> {{ $delete->deleted_by }}</li>
                           </ul>
-                          <p style="margin-bottom: 1.6em;">Por favor, confirma si se autoriza la eliminación.</p>
+                          <p style="margin-bottom: 1.6em;">Por favor, en el siguiente enlace confirma autorización.</p>
                         </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:separate;line-height:100%;">
+                          <tbody>
+                            <tr>
+                              <td align="center" bgcolor="#409dcd" role="presentation" style="border:none;border-radius:3px;cursor:auto;mso-padding-alt:10px 25px;background:#409dcd;" valign="middle">
+                                <a href="{{ url('aprobar-solicitudes/'. $delete->id) }}" style="display:inline-block;background:#409dcd;color:#ffffff;font-family:sans-serif;font-size:15px;font-weight:normal;line-height:18px;margin:0;text-decoration:none;text-transform:none;padding:10px 25px;mso-padding-alt:0px;border-radius:3px;" target="_blank"> Autorizar </a>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </td>
                     </tr>
                   </tbody>

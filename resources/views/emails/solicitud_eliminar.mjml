@@ -23,12 +23,17 @@
                         <li><strong>Tipo:</strong> {{ $delete->type }}</li>
                         <li><strong>Sucursal:</strong> {{ $delete->branch }}</li>
                         <li><strong>Razón:</strong> {{ $delete->reason }}</li>
-                        <li><strong>Monto:</strong> {{ $delete->value }}</li>
+                        <li><strong>Monto:</strong> ${{ $delete->value }}</li>
                         <li><strong>Solicitado por:</strong> {{ $delete->deleted_by }}</li>       
                     </ul>
 
-                    <p>Por favor, confirma si se autoriza la eliminación.</p>
+                    <p>Por favor, en el siguiente enlace confirma autorización.</p>
+                    
                 </mj-text>
+                <mj-button background-color="#409dcd" color="#ffffff" 
+                    href="{{ url('aprobar-solicitudes/'. $delete->id) }}">
+                    Autorizar
+                </mj-button>
             </mj-column>
         </mj-section>
 

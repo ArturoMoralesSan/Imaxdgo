@@ -44,6 +44,29 @@ class DeleteHistoryController extends Controller
         return response()->json(['success' => true], 200);
     }
 
+    public function approveEmail($id)
+    {
+        $delete = DeleteHistory::find($id);
+        if($delete) {
+
+            if ($delete->type == 'gasto') {
+                $data = Expense::find($delete->record_id);
+            } elseif($delete->type == 'servicio') {
+                $data = Service::find($delete->record_id);
+            }
+
+            $data->delete_approved = true;
+            $data->save();
+
+            $delete->status = 'aprobado';
+            $delete->save();
+
+            return view('admin.peticiones.aprobar', compact('delete'));
+        } else {
+            return view('admin.peticiones.error');
+        }
+    }
+
     public function requestDelete($id, $tipo)
     {
         abort_unless(Gate::allows('view.expenses') || Gate::allows('create.expenses'), 403);
