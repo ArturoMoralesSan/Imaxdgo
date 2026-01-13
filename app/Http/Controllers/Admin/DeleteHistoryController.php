@@ -35,8 +35,7 @@ class DeleteHistoryController extends Controller
             $data = Service::find($delete->record_id);
         }
 
-        $data->delete_approved = true;
-        $data->save();
+        $data->delete();
 
         $delete->status = 'aprobado';
         $delete->save();
@@ -55,8 +54,7 @@ class DeleteHistoryController extends Controller
                 $data = Service::find($delete->record_id);
             }
 
-            $data->delete_approved = true;
-            $data->save();
+            $data->delete();
 
             $delete->status = 'aprobado';
             $delete->save();

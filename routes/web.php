@@ -34,7 +34,9 @@ use Illuminate\Support\Facades\Auth;
 |
 */
 
-Route::get('/', [App\Http\Controllers\Auth\LoginController::class, 'showLoginForm']);
+Route::get('/', function () {
+    return redirect()->route('login');
+});
 Auth::routes(['register' => false]);
 Route::get('login/{provider}', [LoginController::class, 'redirectToProvider']);
 Route::get('{provider}/callback', [LoginController::class,'handleProviderCallback']);
