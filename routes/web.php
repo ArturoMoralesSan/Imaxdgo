@@ -51,6 +51,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], functio
 
     Route::get('pdf/{id}', [PdfController::class, 'pdf']);
 
+    Route::get('cierre-dia', [PdfController::class, 'closeDay']);
+
     Route::get('pdf-doctores/{id}/{branch_id?}', [PdfController::class, 'pdfDoctors']);
     Route::get('pdf-doctor/{id}', [PdfController::class, 'pdfDoctor']);
     Route::get('doctores/pdf', [PdfController::class, 'exportDoctorPdf'])->name('doctores.export.pdf');

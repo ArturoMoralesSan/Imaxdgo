@@ -58,5 +58,10 @@ class Branch extends Model
         return $this->hasMany(Doctor::class);
     }
     
+   public function todayClosure()
+    {
+        return $this->hasOne(DailyClosure::class)
+            ->whereDate('date', now()->format('Y-m-d'));
+    }
 
 }

@@ -27,12 +27,12 @@ class DashboardController extends Controller
 
         if (!Auth::user()->isSuperAdmin()) {
             // Usuario normal: solo su sucursal
-            $branches = Branch::with(['services' => function($q) use ($start_date, $end_date) {
+            $branches = Branch::with(['todayClosure', 'services' => function($q) use ($start_date, $end_date) {
                 $q->whereBetween('date', [$start_date, $end_date]);
             }])->where('id',Auth::user()->branch_id)->whereHas('services', function($q) use ($start_date, $end_date){
                 $q->whereBetween('date', [$start_date, $end_date]);
             })->get();
-
+            
             return view('admin.dashboard', compact('branches'));
         }
 

@@ -1,0 +1,29 @@
+<mjml>
+    <mj-head>
+        <mj-title>Solicitud de eliminación</mj-title>
+        <mj-include path="./_styles.mjml" />
+    </mj-head>
+    <mj-body background-color="#fff">
+        <mj-include path="./_header.mjml" />
+
+        <mj-section background-color="#fcfcfc"
+            border-left="1px solid #f1f2f4"
+            border-bottom="1px solid #f1f2f4"
+            border-right="1px solid #f1f2f4"
+        >
+            <mj-column>
+                <mj-text align="center" font-size="20px" font-weight="bold">
+                Cierre diario
+                </mj-text>
+                <mj-text>
+                    <p>
+                        Se ha completado el cierre diario de todas las sucursales en Durango.<br>
+                        Se adjunta el PDF con el desglose por sucursal y el monto de efectivo a recoger.
+                    </p>
+                </mj-text>
+            </mj-column>
+        </mj-section>
+
+        <mj-include path="./_footer.mjml" />
+    </mj-body>
+</mjml>

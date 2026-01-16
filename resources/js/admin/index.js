@@ -34,6 +34,7 @@ import LazyResourceLoader from './components/LazyResourceLoader.vue';
 
 import ResourceTableSortable from './components/ResourceTableSortable.vue';
 import AproveButton from './components/AproveButton.vue';
+import CloseButton from './components/CloseButton.vue';
 
 
 (function() {
@@ -73,6 +74,7 @@ import AproveButton from './components/AproveButton.vue';
     Vue.component('lazy-resource-loader', LazyResourceLoader);
     Vue.component('resource-table-sortable', ResourceTableSortable);
     Vue.component('approve-button', AproveButton);
+    Vue.component('close-button', CloseButton);
 
 
     const vm = new Vue({

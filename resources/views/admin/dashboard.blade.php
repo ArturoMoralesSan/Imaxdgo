@@ -55,13 +55,39 @@
                                 $@{{ branchItem.amount_services }}
                             </td>
                             <td data-label="Reporte:">
+                            <!-- Ya tiene cierre -->
+                            <template v-if="branchItem.today_closure">
                                 <link-pdf 
                                     :branchid="branchItem.id"
                                     url="/admin/pdf/"
                                     startdate="{{ app('request')->input('start_date') }}"
                                     enddate="{{ app('request')->input('end_date') }}">
-                                </link-pdf>                                    
-                            </td>
+                                </link-pdf>
+                            </template>
+
+                            <!-- Puede cerrar y aún no ha cerrado -->
+                            <template v-else-if="branchItem.ending">
+                                <close-button 
+                                    class="btn--primary table-resource__button" 
+                                    :url="$root.path + '/admin/cierre-dia/'"
+                                    :resource-id="branchItem.id"
+                                >
+                                    Cierre de día
+                                </close-button>
+                            </template>
+
+                            <!-- No puede cerrar (ending = false) -->
+                            <template v-else>
+                                <link-pdf 
+                                    :branchid="branchItem.id"
+                                    url="/admin/pdf/"
+                                    startdate="{{ app('request')->input('start_date') }}"
+                                    enddate="{{ app('request')->input('end_date') }}">
+                                </link-pdf>
+                            </template>
+
+                        </td>
+                        </td>
                         </tr>
                     </tbody>
                 </table>
