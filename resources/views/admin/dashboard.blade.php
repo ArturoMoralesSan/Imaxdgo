@@ -65,28 +65,15 @@
                                 </link-pdf>
                             </template>
 
-                            <!-- Puede cerrar y aún no ha cerrado -->
-                            <template v-else-if="branchItem.ending">
-                                <close-button 
-                                    class="btn--primary table-resource__button" 
-                                    :url="$root.path + '/admin/cierre-dia/'"
-                                    :resource-id="branchItem.id"
-                                >
-                                    Cierre de día
-                                </close-button>
-                            </template>
+                            
+                            <link-pdf 
+                                :branchid="branchItem.id"
+                                url="/admin/pdf/"
+                                startdate="{{ app('request')->input('start_date') }}"
+                                enddate="{{ app('request')->input('end_date') }}">
+                            </link-pdf>
+                            
 
-                            <!-- No puede cerrar (ending = false) -->
-                            <template v-else>
-                                <link-pdf 
-                                    :branchid="branchItem.id"
-                                    url="/admin/pdf/"
-                                    startdate="{{ app('request')->input('start_date') }}"
-                                    enddate="{{ app('request')->input('end_date') }}">
-                                </link-pdf>
-                            </template>
-
-                        </td>
                         </td>
                         </tr>
                     </tbody>

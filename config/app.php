@@ -2,6 +2,10 @@
 
 return [
 
+
+    'auto_close_token' => env('AUTO_CLOSE_TOKEN'),
+
+
     /*
     |--------------------------------------------------------------------------
     | Custom: Indexed by Search Engines

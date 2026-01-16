@@ -45,13 +45,14 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 Route::get('notas/{id}', [PdfController::class, 'pdfnote']);
 Route::get('aprobar-solicitudes/{id}', [DeleteHistoryController::class, 'approveEmail']);
+Route::get('/auto/cierre-dia/{token}', [PdfController::class, 'autoCloseDay']);
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], function() {
     Route::get('/', [DashboardController::class, 'index']);
 
     Route::get('pdf/{id}', [PdfController::class, 'pdf']);
 
-    Route::get('cierre-dia', [PdfController::class, 'closeDay']);
+    //Route::get('cierre-dia', [PdfController::class, 'closeDay']);
 
     Route::get('pdf-doctores/{id}/{branch_id?}', [PdfController::class, 'pdfDoctors']);
     Route::get('pdf-doctor/{id}', [PdfController::class, 'pdfDoctor']);

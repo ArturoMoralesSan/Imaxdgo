@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\DB;
 use Luecano\NumeroALetras\NumeroALetras;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\DailyClosureReportMail;
+use Illuminate\Support\Facades\Cache;
+
 
 class PdfController extends Controller
 {
@@ -391,55 +393,76 @@ class PdfController extends Controller
         //return $pdf->download('report.pdf');   
     }
 
-    public function closeDay()
+    public function autoCloseDay($token)
     {
-        $user     = Auth::user();
-        $branchId = $user->branch_id;
-        $date     = Carbon::now()->format('Y-m-d');
-
-        if (DailyClosure::where('branch_id', $branchId)->where('date', $date)->exists()) {
-            return response()->json([
-                'message' => 'Esta sucursal ya tiene un cierre de hoy.'
-            ], 422);
+        if ($token !== config('app.auto_close_token')) {
+            abort(403);
         }
 
-        $services = Service::whereDate('date', $date)
-            ->where('branch_id', $branchId)
-            ->with('payments')
-            ->get();
-
-        $expenses = Expense::whereDate('date', $date)
-            ->where('branch_id', $branchId)
-            ->sum('amount');
-
-        $totals = ['cash' => 0, 'card' => 0, 'transfer' => 0];
-
-        foreach ($services as $service) {
-            foreach ($service->payments as $payment) {
-                match ($payment->key_name) {
-                    'efectivo' => $totals['cash'] += $payment->pivot->cost,
-                    'tarjeta-debito-credito' => $totals['card'] += $payment->pivot->cost,
-                    'transferencia' => $totals['transfer'] += $payment->pivot->cost,
-                };
-            }
+        if (Carbon::now()->lt(Carbon::today()->setTime(15, 0))) {
+            return response('Aún no es hora de cierre', 200);
         }
 
-        $total         = $totals['cash'] + $totals['card'] + $totals['transfer'] - $expenses;
-        $totalDelivery = $totals['cash'] - $expenses;
-
-        DailyClosure::create([
-            'branch_id'      => $branchId,
-            'date'           => $date,
-            'cash_total'     => $totals['cash'],
-            'card_total'     => $totals['card'],
-            'transfer_total' => $totals['transfer'],
-            'expenses'       => $expenses,
-            'total'          => $total,
-            'total_delivery' => $totalDelivery,
-            'closed_at'      => now(),
-        ]);
+        $date = Carbon::today()->toDateString();
 
         $branchesToClose = Branch::where('ending', 1)->pluck('id');
+
+        if ($branchesToClose->isEmpty()) {
+            return response('No hay sucursales para cerrar', 200);
+        }
+
+        foreach ($branchesToClose as $branchId) {
+
+            if (DailyClosure::where('branch_id', $branchId)
+                ->where('date', $date)
+                ->exists()) {
+                continue;
+            }
+
+            $services = Service::whereDate('date', $date)
+                ->where('branch_id', $branchId)
+                ->with('payments')
+                ->get();
+
+            $expenses = Expense::whereDate('date', $date)
+                ->where('branch_id', $branchId)
+                ->sum('amount');
+
+            $totals = [
+                'cash' => 0,
+                'card' => 0,
+                'transfer' => 0,
+            ];
+
+            foreach ($services as $service) {
+                foreach ($service->payments as $payment) {
+                    if ($payment->key_name === 'efectivo') {
+                        $totals['cash'] += $payment->pivot->cost;
+                    }
+                    if ($payment->key_name === 'tarjeta-debito-credito') {
+                        $totals['card'] += $payment->pivot->cost;
+                    }
+                    if ($payment->key_name === 'transferencia') {
+                        $totals['transfer'] += $payment->pivot->cost;
+                    }
+                }
+            }
+
+            $totalDelivery = $totals['cash'] - $expenses;
+            $total = $totals['cash'] + $totals['card'] + $totals['transfer'] - $expenses;
+
+            DailyClosure::create([
+                'branch_id'      => $branchId,
+                'date'           => $date,
+                'cash_total'     => $totals['cash'],
+                'card_total'     => $totals['card'],
+                'transfer_total' => $totals['transfer'],
+                'expenses'       => $expenses,
+                'total'          => $total,
+                'total_delivery' => $totalDelivery,
+                'closed_at'      => now(),
+            ]);
+        }
 
         $closedTodayCount = DailyClosure::whereDate('date', $date)
             ->whereIn('branch_id', $branchesToClose)
@@ -452,13 +475,13 @@ class PdfController extends Controller
                 ->whereIn('branch_id', $branchesToClose)
                 ->get();
 
-            Mail::to('admin@tudominio.com')
+            Mail::to('adrianterronesg@gmail.com')
+                ->bcc('ramon.morales41@gmail.com')
                 ->send(new DailyClosureReportMail($closures, $date));
+
         }
 
-        return response()->json([
-            'message' => 'Day successfully closed'
-        ]);
+        return response('Cierre automático ejecutado correctamente', 200);
     }
 
 
