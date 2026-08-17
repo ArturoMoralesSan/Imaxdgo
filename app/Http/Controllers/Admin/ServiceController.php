@@ -54,7 +54,8 @@ class ServiceController extends Controller
         $services = Service::with('branch:id,name','studies','doctor')
         ->whereMonth('created_at', $month)
         ->whereYear('created_at', $year)
-        ->orderBy('date','DESC');
+        ->orderBy('date','DESC')
+        ->orderBy('id', 'DESC');
         
 
         if (!Auth::user()->isSuperAdmin()) {

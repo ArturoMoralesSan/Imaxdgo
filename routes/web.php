@@ -20,6 +20,9 @@ use App\Http\Controllers\Admin\PdfController;
 use App\Http\Controllers\Admin\RaceController;
 use App\Http\Controllers\Admin\RaceRegistrationController;
 use App\Http\Controllers\Admin\DeleteHistoryController;
+
+use App\Http\Controllers\GiveawayController;
+
 use Illuminate\Support\Facades\Auth;
 
 
@@ -189,4 +192,47 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], functio
 
     Route::get('carrera-estadistica', [RaceRegistrationController::class, 'statics']);
 
+    //sorteos
+    Route::get('/giveaways', [GiveawayController::class, 'index'])
+    ->name('giveaways.index');
+
+    Route::get('/giveaways/create', [GiveawayController::class, 'create'])
+        ->name('giveaways.create');
+
+
+    Route::post('/giveaways', [GiveawayController::class, 'store'])
+        ->name('giveaways.store');
+
+        // Formulario editar
+    Route::get('giveaways/{id}/editar', [GiveawayController::class, 'edit'])
+        ->name('giveaways.edit');
+
+    // Actualizar
+    Route::put('giveaways/{id}/editar', [GiveawayController::class, 'update'])
+        ->name('giveaways.update');
+
+    Route::get('giveaways/{id}/participants', [GiveawayController::class, 'participants'])
+    ->name('giveaways.participants');
+
+
+
+    Route::get('giveaways/validar', [GiveawayController::class, 'validateParticipant'])
+    ->name('giveaways.validate');
+
+    Route::get('giveaways/validar/{folio}', [GiveawayController::class, 'findParticipant'])
+        ->name('giveaways.validate.find');
+
+    Route::post('giveaways/validar', [GiveawayController::class, 'validateParticipantStore'])
+        ->name('giveaways.validate.store');
+
 });
+
+#quiz participante
+Route::get('giveaways/{id}/participar', [GiveawayController::class, 'participant'])
+    ->name('giveaways.participant');
+
+Route::post('giveaways/{id}/participate',[GiveawayController::class, 'participate'])
+    ->name('giveaways.participate');
+
+Route::get('giveaways/{id}/participar/{participant}/folio', [GiveawayController::class, 'participantResult'])
+    ->name('giveaways.participant.result');

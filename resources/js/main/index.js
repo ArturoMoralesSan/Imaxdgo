@@ -14,8 +14,10 @@ import ServiceRegistrationForm from './components/forms/service-registration-for
 import StatusProjectForm from './components/forms/status-project-form/StatusProjectForm.vue';
 import ButtonSearch from './components/ButtonSearch.vue';
 import TruncatedText from './components/TruncatedText.vue';
+import Participant from './components/forms/Participant.vue';
 
 import Tabs from './components/tabs/Tabs.vue';
+import ParticipantValidator from './components/forms/ParticipantValidator.vue';
 
 (function() {
     /* Base components
@@ -41,6 +43,9 @@ import Tabs from './components/tabs/Tabs.vue';
     Vue.component('truncated-text', TruncatedText);
 
     Vue.component('tabs-component', Tabs);
+    Vue.component('participant', Participant);
+    Vue.component('participant-validator', ParticipantValidator);
+
 
     /**
      * Vue instance

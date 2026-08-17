@@ -114,7 +114,7 @@
                                     @{{ serviceItem.no_rx }}
                                 </td>
                                 <td data-label="Nota:">
-                                    <a class="btn btn-nowrap btn--sm btn--primary table-resource__button mr-2" :href="$root.path + '/notas/' + serviceItem.id">
+                                    <a class="btn btn-nowrap btn--sm btn--primary table-resource__button mr-2"  target="_blank" :href="$root.path + '/notas/' + serviceItem.id">
                                         PDF
                                     </a>
                                 </td>
@@ -127,7 +127,7 @@
                                     @if($admin)
                                         <delete-button 
                                             class="btn--danger table-resource__button" 
-                                            :url="$root.path + '/admin/gastos/eliminar/' + serviceItem.id"
+                                            :url="$root.path + '/admin/servicios/eliminar/' + serviceItem.id"
                                             :resource-id="serviceItem.id"
                                             :options="{ onDelete: onResourceDelete }"
                                         >
@@ -155,7 +155,7 @@
                                         <div v-if="serviceItem.delete_requested == 1 && serviceItem.delete_approved == 1">
                                             <delete-button 
                                                 class="btn--danger table-resource__button" 
-                                                :url="$root.path + '/admin/gastos/eliminar/' + serviceItem.id"
+                                                :url="$root.path + '/admin/servicios/eliminar/' + serviceItem.id"
                                                 :resource-id="serviceItem.id"
                                                 :options="{ onDelete: onResourceDelete }"
                                             >

@@ -56,15 +56,6 @@
                             </td>
                             <td data-label="Reporte:">
                             <!-- Ya tiene cierre -->
-                            <template v-if="branchItem.today_closure">
-                                <link-pdf 
-                                    :branchid="branchItem.id"
-                                    url="/admin/pdf/"
-                                    startdate="{{ app('request')->input('start_date') }}"
-                                    enddate="{{ app('request')->input('end_date') }}">
-                                </link-pdf>
-                            </template>
-
                             
                             <link-pdf 
                                 :branchid="branchItem.id"

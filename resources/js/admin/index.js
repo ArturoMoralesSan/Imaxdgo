@@ -36,6 +36,8 @@ import ResourceTableSortable from './components/ResourceTableSortable.vue';
 import AproveButton from './components/AproveButton.vue';
 import CloseButton from './components/CloseButton.vue';
 
+import GiveawayForm from './components/GiveawayForm.vue';
+
 
 (function() {
     /* Base components
@@ -76,6 +78,7 @@ import CloseButton from './components/CloseButton.vue';
     Vue.component('approve-button', AproveButton);
     Vue.component('close-button', CloseButton);
 
+    Vue.component('giveaway-form', GiveawayForm);
 
     const vm = new Vue({
         el: '#dashboard',

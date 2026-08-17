@@ -35,6 +35,8 @@
         <!-- Icons -->
         @include('layout.icons')
 
+        @yield('styles')
+
         <!-- CSS -->
         <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i&display=swap" rel="stylesheet">
         <link href="{{ version('css/main.css') }}" rel="stylesheet">
