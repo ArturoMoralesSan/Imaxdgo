@@ -12,7 +12,7 @@
     <div class="container">
 
         <participant-validator
-            search-action="{{ url('admin/giveaways/validar') }}"
+            search-action="{{ url('admin/sorteos/validar') }}"
             validate-action="{{ route('giveaways.validate.store') }}"
         >
         </participant-validator>

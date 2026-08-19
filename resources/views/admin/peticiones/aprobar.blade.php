@@ -11,7 +11,7 @@
         <div style="height:70vh;" class="login-form d-flex flex-col items-center justify-center">
             
             <div class="form-boxed d-flex flex-col items-center justify-center" style="max-width:400px;">
-                <img class="center login-image" src="{{ url('img/imax-logo.png') }}" alt="">
+                <img class="center login-image" src="{{ url('img/imax-logo1.png') }}" alt="">
                 <h1 class="h2">Solicitud aprobada</h1>
                 <p >Se ha aprobado la siguiente petición</p>
                 <ul>

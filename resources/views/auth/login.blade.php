@@ -9,7 +9,7 @@
     
     <div class="container">
         <div class="login-form flex-col">
-            <img class="login-image" src="{{ url('img/imax-logo.png') }}" alt="">
+            <img class="login-image" src="{{ url('img/imax-logo1.png') }}" alt="">
             
             <form class="form-boxed" method="POST" action="{{ route('login') }}">
                 @csrf

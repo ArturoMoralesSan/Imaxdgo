@@ -109,7 +109,7 @@
                                   <tbody>
                                     <tr>
                                       <td style="width:130px;">
-                                        <img alt="imaxdgo" src="https://imaxdgo.com/img/imax-logo.png" style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;" width="130" height="auto">
+                                        <img alt="imaxdgo" src="https://imaxdgo.com/img/imax-logo1.png" style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;" width="130" height="auto">
                                       </td>
                                     </tr>
                                   </tbody>

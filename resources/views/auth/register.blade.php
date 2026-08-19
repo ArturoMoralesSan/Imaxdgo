@@ -7,7 +7,7 @@
 <div class="section section-login">
     <div class="container">
         <div class="login-form flex-col"> 
-            <img class="login-image" src="{{ url('img/imax-logo.png') }}" alt="">       
+            <img class="login-image" src="{{ url('img/imax-logo1.png') }}" alt="">       
             <form class="form-boxed" method="POST" action="{{ route('register') }}">
                 @csrf
                 <h1 class="h3 text-center">Registro</h1>

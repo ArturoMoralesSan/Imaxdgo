@@ -19,7 +19,7 @@
 
     {{-- LOGO --}}
     <img style="width:160px; display:block; margin:0 auto;"
-         src="https://imaxdgo.com/img/imax-logo.png">
+         src="https://imaxdgo.com/img/imax-logo1.png">
 
     <h5 class="text-center mt-3">
         Corte General Diario

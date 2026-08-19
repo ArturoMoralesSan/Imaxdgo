@@ -138,7 +138,7 @@
             </h3>
 
             <p class="description mb-6">
-                Agrega las preguntas que tendrá el giveaway.
+                Agrega las preguntas que tendrá el sorteo.
                 Puedes utilizar preguntas de validación o de opción múltiple.
             </p>
 
@@ -154,7 +154,7 @@
                     <div class="flex justify-between items-center mb-4">
 
                         <h4>
-                            Pregunta @{{ index + 1 }}
+                            Pregunta {{ index + 1 }}
                         </h4>
 
                         <button
@@ -444,7 +444,7 @@
                     class="fa-solid fa-plus"
                 ></i>
 
-                {{ giveaway ? 'Actualizar' : 'Crear giveaway' }}
+                {{ giveaway ? 'Actualizar' : 'Crear' }}
 
             </form-button>
 

@@ -38,7 +38,7 @@
 </head>
 <body>
     <div class="page_break mt-4">
-        <img style="width: 160px; display: block; margin: 0 auto;" src="{{ url('img/imax-logo.png') }}" alt="IMAX Logo">
+        <img style="width: 160px; display: block; margin: 0 auto;" src="{{ url('img/imax-logo1.png') }}" alt="IMAX Logo">
         
         <div class="text-center my-3">
             <h3>Reporte General de Doctores</h3>

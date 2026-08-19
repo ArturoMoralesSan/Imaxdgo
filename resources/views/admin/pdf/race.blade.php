@@ -10,7 +10,7 @@
 </head>
 <body>
     <div class="page_break mt-4">
-        <img style="width: 160px;display: block;margin: 0 auto;" src="{{ url('img/imax-logo.png')}}" alt="">
+        <img style="width: 160px;display: block;margin: 0 auto;" src="{{ url('img/imax-logo1.png')}}" alt="">
         <div class="row">
             <div class="col-md-12">
                 <table class="table table-bordered">

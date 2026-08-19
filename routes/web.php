@@ -193,46 +193,46 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], functio
     Route::get('carrera-estadistica', [RaceRegistrationController::class, 'statics']);
 
     //sorteos
-    Route::get('/giveaways', [GiveawayController::class, 'index'])
+    Route::get('/sorteos', [GiveawayController::class, 'index'])
     ->name('giveaways.index');
 
-    Route::get('/giveaways/create', [GiveawayController::class, 'create'])
+    Route::get('/sorteos/agregar', [GiveawayController::class, 'create'])
         ->name('giveaways.create');
 
 
-    Route::post('/giveaways', [GiveawayController::class, 'store'])
+    Route::post('/sorteos', [GiveawayController::class, 'store'])
         ->name('giveaways.store');
 
         // Formulario editar
-    Route::get('giveaways/{id}/editar', [GiveawayController::class, 'edit'])
+    Route::get('sorteos/{id}/editar', [GiveawayController::class, 'edit'])
         ->name('giveaways.edit');
 
     // Actualizar
-    Route::put('giveaways/{id}/editar', [GiveawayController::class, 'update'])
+    Route::put('sorteos/{id}/editar', [GiveawayController::class, 'update'])
         ->name('giveaways.update');
 
-    Route::get('giveaways/{id}/participants', [GiveawayController::class, 'participants'])
+    Route::get('sorteos/{id}/participants', [GiveawayController::class, 'participants'])
     ->name('giveaways.participants');
 
 
 
-    Route::get('giveaways/validar', [GiveawayController::class, 'validateParticipant'])
+    Route::get('sorteos/validar', [GiveawayController::class, 'validateParticipant'])
     ->name('giveaways.validate');
 
-    Route::get('giveaways/validar/{folio}', [GiveawayController::class, 'findParticipant'])
+    Route::get('sorteos/validar/{folio}', [GiveawayController::class, 'findParticipant'])
         ->name('giveaways.validate.find');
 
-    Route::post('giveaways/validar', [GiveawayController::class, 'validateParticipantStore'])
+    Route::post('sorteos/validar', [GiveawayController::class, 'validateParticipantStore'])
         ->name('giveaways.validate.store');
 
 });
 
 #quiz participante
-Route::get('giveaways/{id}/participar', [GiveawayController::class, 'participant'])
+Route::get('sorteos/{id}/participar', [GiveawayController::class, 'participant'])
     ->name('giveaways.participant');
 
-Route::post('giveaways/{id}/participate',[GiveawayController::class, 'participate'])
+Route::post('sorteos/{id}/participate',[GiveawayController::class, 'participate'])
     ->name('giveaways.participate');
 
-Route::get('giveaways/{id}/participar/{participant}/folio', [GiveawayController::class, 'participantResult'])
+Route::get('sorteos/{id}/participar/{participant}/folio', [GiveawayController::class, 'participantResult'])
     ->name('giveaways.participant.result');

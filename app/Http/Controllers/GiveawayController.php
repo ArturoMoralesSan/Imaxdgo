@@ -18,8 +18,24 @@ class GiveawayController extends Controller
     public function index()
     {
         $giveaways = Giveaway::withCount('questions')
-            ->latest()
-            ->get();
+        ->get();
+
+        $giveaways->transform(function ($giveaway) {
+
+        $giveaway->starts_at_formatted = $giveaway->starts_at
+            ? $giveaway->starts_at
+                ->timezone('America/Monterrey')
+                ->format('d/m/Y h:i A')
+            : null;
+
+        $giveaway->ends_at_formatted = $giveaway->ends_at
+            ? $giveaway->ends_at
+                ->timezone('America/Monterrey')
+                ->format('d/m/Y h:i A')
+            : null;
+
+        return $giveaway;
+    });
 
         return view('giveaways.index', compact('giveaways'));
     }
@@ -124,7 +140,7 @@ class GiveawayController extends Controller
         alert('Se ha agregado un sorteo correctamente.');
 
         return response('', 204, [
-            'Redirect-To' => url('admin/giveaways/')
+            'Redirect-To' => url('admin/sorteos/')
         ]);
     }
 
@@ -240,7 +256,7 @@ class GiveawayController extends Controller
         alert('Se ha actualizado un sorteo correctamente.');
 
         return response('', 204, [
-            'Redirect-To' => url('admin/giveaways/')
+            'Redirect-To' => url('admin/sorteos/')
         ]);
     }
 

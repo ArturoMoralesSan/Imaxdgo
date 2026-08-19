@@ -201,7 +201,7 @@
         </div>
 
         <img
-            src="{{ url('img/imax-logo.png') }}"
+            src="{{ url('img/imax-logo1.png') }}"
             alt="IMAX"
             class="giveaway-result__logo"
         >

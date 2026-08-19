@@ -1,9 +1,9 @@
 @extends('layout.dashboard-master')
 
 {{-- Metadata --}}
-@section('title', 'Editar giveaway')
-@section('tab_title', 'Editar giveaway | ' . config('app.name'))
-@section('description', 'Editar giveaway.')
+@section('title', 'Editar sorteo')
+@section('tab_title', 'Editar sorteo | ' . config('app.name'))
+@section('description', 'Editar sorteo.')
 @section('css_classes', 'dashboard')
 
 @section('content')
@@ -12,7 +12,7 @@
 
     <div class="dashboard-heading">
         <h1 class="dashboard-heading__title">
-            Editar giveaway
+            Editar sorteo
         </h1>
     </div>
 
@@ -25,7 +25,7 @@
             <span class="color-link">«</span>
 
             <a href="{{ route('giveaways.index') }}">
-                Ver todos los giveaways
+                Ver todos los sorteos
             </a>
 
         </p>

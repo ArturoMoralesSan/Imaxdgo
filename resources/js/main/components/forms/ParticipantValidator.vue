@@ -8,7 +8,7 @@
             <div class="validator-header">
 
                 <img
-                    src="/img/imax-logo.png"
+                    src="/img/imax-logo1.png"
                     alt="IMAX"
                 >
 

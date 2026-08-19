@@ -7,7 +7,7 @@
             <div class="participant-header">
 
                 <img
-                    src="/img/imax-logo.png"
+                    src="/img/imax-logo1.png"
                     alt="IMAX"
                     class="participant-logo"
                 >

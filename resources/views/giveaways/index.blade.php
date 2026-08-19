@@ -1,9 +1,9 @@
 @extends('layout.dashboard-master')
 
 {{-- Metadata --}}
-@section('title', 'Giveaways')
-@section('tab_title', 'Giveaways | ' . config('app.name'))
-@section('description', 'Lista de giveaways.')
+@section('title', 'Sorteos')
+@section('tab_title', 'Sorteos | ' . config('app.name'))
+@section('description', 'Lista de Sorteos.')
 @section('css_classes', 'dashboard')
 
 @section('content')
@@ -11,11 +11,11 @@
     <div class="dashboard-heading">
 
         <h1 class="dashboard-heading__title">
-            Giveaways
+            Sorteos
         </h1>
 
         <p class="dashboard-heading__caption">
-            Hay {{ $giveaways->count() }} giveaways registrados.
+            Hay {{ $giveaways->count() }} sorteos registrados.
         </p>
 
     </div>
@@ -29,14 +29,14 @@
         <section class="db-panel">
 
             <h3 class="db-panel__title">
-                Lista de giveaways
+                Lista de sorteos
             </h3>
 
 
             @if (! $giveaways->count())
 
                 <p class="text-center py-1">
-                    Por el momento no hay giveaways registrados.
+                    Por el momento no hay sorteos registrados.
                 </p>
 
             @else
@@ -93,11 +93,7 @@
                                 {{-- Nombre --}}
                                 <td data-label="Nombre:">
 
-                                    <a
-                                        :href="$root.path + '/admin/giveaways/' + giveaway.id"
-                                    >
                                         @{{ giveaway.name }}
-                                    </a>
 
                                 </td>
 
@@ -125,7 +121,7 @@
                                 {{-- Inicio --}}
                                 <td data-label="Inicio:">
 
-                                    @{{ giveaway.starts_at || 'Sin fecha' }}
+                                    @{{ giveaway.starts_at_formatted || 'Sin fecha' }}
 
                                 </td>
 
@@ -133,7 +129,7 @@
                                 {{-- Finalización --}}
                                 <td data-label="Finalización:">
 
-                                    @{{ giveaway.ends_at || 'Sin fecha' }}
+                                    @{{ giveaway.ends_at_formatted || 'Sin fecha' }}
 
                                 </td>
 
@@ -151,11 +147,28 @@
                                     class="table-resource__actions"
                                     data-label="Acciones:"
                                 >
+                                {{-- Participar --}}
+                                <a
+                                    class="btn btn-nowrap btn--sm btn--green table-resource__button mr-2"
+                                    :href="$root.path + '/sorteos/' + giveaway.id + '/participar/'"
+                                    target="_blank"
+                                >
+                                    Participar
+                                </a>
+
+
+                                {{-- Validar --}}
+                                <a
+                                    class="btn btn-nowrap btn--sm btn--blue table-resource__button mr-2"
+                                    :href="$root.path + '/admin/sorteos/validar'"
+                                >
+                                    Validar
+                                </a>
 
                                     {{-- Editar --}}
                                     <a
                                         class="btn btn-nowrap btn--sm btn--blue table-resource__button mr-2"
-                                        :href="$root.path + '/admin/giveaways/' + giveaway.id + '/editar'"
+                                        :href="$root.path + '/admin/sorteos/' + giveaway.id + '/editar'"
                                     >
                                         <img
                                             class="svg-icon"
@@ -166,7 +179,7 @@
 
                                     <delete-button
                                         class="btn--danger table-resource__button"
-                                        :url="$root.path + '/admin/giveaways/eliminar/' + giveaway.id"
+                                        :url="$root.path + '/admin/sorteos/eliminar/' + giveaway.id"
                                         :resource-id="giveaway.id"
                                         :options="{ onDelete: onResourceDelete }"
                                     >
