@@ -15,6 +15,7 @@ class Participant extends Model
         'instagram',
         'folio',
         'status',
+        'prize_type',
         'prize_delivered',
     ];
 

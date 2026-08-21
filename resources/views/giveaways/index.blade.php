@@ -93,7 +93,7 @@
                                 {{-- Nombre --}}
                                 <td data-label="Nombre:">
 
-                                        @{{ giveaway.name }}
+                                    @{{ giveaway.name }}
 
                                 </td>
 
@@ -147,7 +147,15 @@
                                     class="table-resource__actions"
                                     data-label="Acciones:"
                                 >
-                                {{-- Participar --}}
+                                
+                                {{-- participantes --}}
+                                <a
+                                    class="btn btn-nowrap btn--sm btn--green table-resource__button mr-2"
+                                    :href="$root.path + '/admin/sorteos/' + giveaway.id + '/participantes/'"
+                                    target="_blank"
+                                >
+                                    Participantes
+                                </a>
                                 <a
                                     class="btn btn-nowrap btn--sm btn--green table-resource__button mr-2"
                                     :href="$root.path + '/sorteos/' + giveaway.id + '/participar/'"

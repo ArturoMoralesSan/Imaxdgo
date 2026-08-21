@@ -217,13 +217,16 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'noCache']], functio
 
 
     Route::get('sorteos/validar', [GiveawayController::class, 'validateParticipant'])
-    ->name('giveaways.validate');
+        ->name('giveaways.validate');
 
     Route::get('sorteos/validar/{folio}', [GiveawayController::class, 'findParticipant'])
         ->name('giveaways.validate.find');
 
     Route::post('sorteos/validar', [GiveawayController::class, 'validateParticipantStore'])
         ->name('giveaways.validate.store');
+        
+    Route::get('sorteos/{id}/participantes', [GiveawayController::class, 'participants'])
+    ->name('giveaways.participants');
 
 });
 

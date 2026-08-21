@@ -286,32 +286,125 @@ public function participate(Request $request, $id)
         'answers' => 'nullable|array',
     ]);
 
+    /*
+     * ==========================================
+     * GENERAR FOLIO CONSECUTIVO POR GIVEAWAY
+     * ==========================================
+     */
+
+    $lastParticipant = Participant::where('giveaway_id', $id)
+        ->whereNotNull('folio')
+        ->orderByDesc('id')
+        ->first();
+
+    $nextNumber = 1;
+
+    if ($lastParticipant) {
+        $nextNumber = ((int) substr($lastParticipant->folio, -2)) + 1;
+    }
+
     $participant = Participant::create([
         'giveaway_id' => $giveaway->id,
         'instagram' => $request->instagram,
-        'folio' => strtoupper(
-            'IMAX-' . Str::random(8)
+        'folio' => 'IMAX-' . strtoupper(Str::random(2)) . str_pad(
+            $nextNumber,
+            2,
+            '0',
+            STR_PAD_LEFT
         ),
         'status' => 'started',
+        'type' => null,
     ]);
 
     $answers = $request->input('answers', []);
 
+    $totalQuestions = 0;
+    $correctAnswers = 0;
+    $incorrectAnswers = 0;
+    $results = [];
+
+    /*
+     * ==========================================
+     * EVALUAR SOLAMENTE PREGUNTAS MULTIPLE
+     * ==========================================
+     *
+     * Las BOOLEAN se ignoran aquí.
+     * Se validarán posteriormente.
+     */
+
     foreach ($giveaway->questions as $question) {
 
+        /*
+         * Solo preguntas que se muestran al usuario.
+         */
+        if (
+            !(
+                $question->show_user === true ||
+                $question->show_user === 1 ||
+                $question->show_user === '1'
+            )
+        ) {
+            continue;
+        }
+
+        /*
+         * Las BOOLEAN no se evalúan aquí.
+         */
+        if ($question->type === 'boolean') {
+            continue;
+        }
+
+        /*
+         * Solo MULTIPLE participa en el resumen.
+         */
         if ($question->type !== 'multiple') {
             continue;
         }
 
         $answer = $answers[$question->id] ?? null;
 
+        /*
+         * Si no respondió una pregunta MULTIPLE,
+         * se considera incorrecta.
+         */
         if ($answer === null) {
+
+            $totalQuestions++;
+            $incorrectAnswers++;
+
+            $results[] = [
+                'question_id' => $question->id,
+                'question' => $question->question,
+                'answer' => null,
+                'correct_answer' => $question->correct_option,
+                'is_correct' => false,
+            ];
+
+            /*
+             * Guardamos también la respuesta vacía.
+             */
+            Response::create([
+                'participant_id' => $participant->id,
+                'question_id' => $question->id,
+                'answer' => null,
+                'is_correct' => 0,
+                'verified' => 0,
+            ]);
+
             continue;
         }
 
-        $isCorrect = strtoupper($answer) === strtoupper(
-            $question->correct_option
-        );
+        $totalQuestions++;
+
+        $isCorrect =
+            strtoupper(trim((string) $answer)) ===
+            strtoupper(trim((string) $question->correct_option));
+
+        if ($isCorrect) {
+            $correctAnswers++;
+        } else {
+            $incorrectAnswers++;
+        }
 
         Response::create([
             'participant_id' => $participant->id,
@@ -320,16 +413,29 @@ public function participate(Request $request, $id)
             'is_correct' => $isCorrect ? 1 : 0,
             'verified' => 0,
         ]);
+
+        $results[] = [
+            'question_id' => $question->id,
+            'question' => $question->question,
+            'answer' => $answer,
+            'correct_answer' => $question->correct_option,
+            'is_correct' => $isCorrect,
+        ];
     }
 
-    $participant->update([
-        'status' => 'completed',
-    ]);
+    
 
     return response()->json([
         'success' => true,
         'participant_id' => $participant->id,
         'folio' => $participant->folio,
+
+        'total_questions' => $totalQuestions,
+        'correct_answers' => $correctAnswers,
+        'incorrect_answers' => $incorrectAnswers,
+
+        'results' => $results,
+
         'redirect' => route(
             'giveaways.participant.result',
             [
@@ -373,8 +479,8 @@ public function findParticipant($folio)
         'giveaway.questions',
         'responses.question'
     ])
-    ->where('folio', $folio)
-    ->first();
+        ->where('folio', $folio)
+        ->first();
 
     if (!$participant) {
         return response()->json([
@@ -384,12 +490,176 @@ public function findParticipant($folio)
 
     $responses = $participant->responses;
 
+    /*
+     * ==========================================
+     * DETECTAR PREGUNTAS BOOLEAN
+     * ==========================================
+     */
+
+    $hasBooleanQuestions = $participant->giveaway->questions
+        ->contains(function ($question) {
+
+            return $question->type === 'boolean' &&
+                (
+                    $question->show_user === true ||
+                    $question->show_user === 1 ||
+                    $question->show_user === '1'
+                );
+        });
+
+    /*
+     * ==========================================
+     * SI YA FUE VALIDADO
+     * ==========================================
+     *
+     * Si validateParticipantStore() ya determinó
+     * el premio, respetamos ese resultado.
+     */
+
+    if ($participant->status === 'validated') {
+
+        $prizeType = $participant->prize_type;
+
+        $allCorrect = $prizeType === 'Premio principal';
+
+    } elseif ($hasBooleanQuestions) {
+
+        /*
+         * ==========================================
+         * TIENE BOOLEAN PENDIENTE
+         * ==========================================
+         */
+
+        $prizeType = 'Sin premio';
+
+        $allCorrect = false;
+
+        $participant->update([
+            'prize_type' => 'Sin premio',
+            'prize_delivered' => 0,
+        ]);
+
+    } else {
+
+        /*
+         * ==========================================
+         * SOLO MULTIPLE
+         * ==========================================
+         */
+
+        $multipleQuestions = $participant->giveaway->questions
+            ->filter(function ($question) {
+
+                return $question->type === 'multiple' &&
+                    (
+                        $question->show_user === true ||
+                        $question->show_user === 1 ||
+                        $question->show_user === '1'
+                    );
+            });
+
+        $allCorrect = true;
+
+        foreach ($multipleQuestions as $question) {
+
+            $response = $responses->firstWhere(
+                'question_id',
+                $question->id
+            );
+
+            /*
+             * Si no existe respuesta,
+             * es incorrecta.
+             */
+
+            if (!$response) {
+                $allCorrect = false;
+                break;
+            }
+
+            /*
+             * Comparar directamente la respuesta
+             * contra la opción correcta.
+             */
+
+            $answer = strtoupper(
+                trim((string) $response->answer)
+            );
+
+            $correctAnswer = strtoupper(
+                trim((string) $question->correct_option)
+            );
+
+            $isCorrect = $answer === $correctAnswer;
+
+            /*
+             * Actualizamos is_correct para mantener
+             * la respuesta sincronizada.
+             */
+
+            $response->update([
+                'is_correct' => $isCorrect ? 1 : 0,
+            ]);
+
+            if (!$isCorrect) {
+                $allCorrect = false;
+                break;
+            }
+        }
+
+        /*
+         * ==========================================
+         * DETERMINAR PREMIO
+         * ==========================================
+         */
+
+        $prizeType = $allCorrect
+            ? 'Premio principal'
+            : 'Consolación';
+
+        /*
+         * ==========================================
+         * GUARDAR PREMIO
+         * ==========================================
+         */
+
+        $participant->update([
+            'prize_type' => $prizeType,
+            'prize_delivered' => 1,
+            'status'  => 'validated'
+        ]);
+    }
+
+    /*
+     * ==========================================
+     * ACTUALIZAR VALORES PARA LA RESPUESTA
+     * ==========================================
+     */
+
+    $participant->prize_type = $prizeType;
+
+    $participant->prize_delivered =
+        (int) $participant->prize_delivered;
+
+    /*
+     * ==========================================
+     * RESPUESTAS MULTIPLE
+     * ==========================================
+     */
+
     $participant->multiple_responses = $responses
         ->filter(function ($response) {
+
             return $response->question &&
                 $response->question->type === 'multiple';
         })
         ->values();
+
+    /*
+     * ==========================================
+     * BOOLEAN PENDIENTES
+     * ==========================================
+     */
 
     $participant->boolean_questions = $participant->giveaway->questions
         ->filter(function ($question) use ($responses) {
@@ -398,13 +668,16 @@ public function findParticipant($folio)
                 return false;
             }
 
-            // Buscar respuesta del participante
             $response = $responses->firstWhere(
                 'question_id',
                 $question->id
             );
 
-            // Si ya fue verificada, no se muestra
+            /*
+             * Si ya fue validada, no aparece
+             * como pendiente.
+             */
+
             if ($response && $response->verified) {
                 return false;
             }
@@ -418,7 +691,6 @@ public function findParticipant($folio)
     ]);
 }
 
-
 public function validateParticipantStore(Request $request)
 {
     $request->validate([
@@ -426,14 +698,19 @@ public function validateParticipantStore(Request $request)
         'responses' => 'required|array',
     ]);
 
-    $participant = Participant::findOrFail(
-        $request->participant_id
-    );
+    $participant = Participant::with([
+        'giveaway.questions',
+        'responses'
+    ])->findOrFail($request->participant_id);
+
+    /*
+     * ==========================================
+     * VALIDAR PREGUNTAS BOOLEAN
+     * ==========================================
+     */
 
     foreach ($request->responses as $questionId => $answer) {
 
-        // Verificar que la pregunta pertenece al giveaway
-        // y que realmente es de tipo boolean
         $question = $participant->giveaway
             ->questions()
             ->where('questions.id', $questionId)
@@ -444,42 +721,227 @@ public function validateParticipantStore(Request $request)
             continue;
         }
 
-        // Buscar si ya existe una respuesta para esta pregunta
+        /*
+         * Convertir correctamente la respuesta.
+         */
+        $isCorrect = filter_var(
+            $answer,
+            FILTER_VALIDATE_BOOLEAN
+        );
+
         $response = $participant->responses()
             ->where('question_id', $question->id)
             ->first();
 
         if ($response) {
 
-            // Ya existe: solamente actualizamos la validación
             $response->update([
-                'answer'      => $answer,
-                'verified'    => true,
+                'answer' => $answer,
+                'is_correct' => $isCorrect ? 1 : 0,
+                'verified' => true,
                 'verified_by' => auth()->id(),
                 'verified_at' => now(),
             ]);
 
         } else {
 
-            // No existe porque el participante nunca contestó esta
-            // pregunta boolean. La creamos nosotros.
             $participant->responses()->create([
                 'question_id' => $question->id,
-                'answer'      => $answer,
-                'is_correct'  => true,
-                'verified'    => true,
+                'answer' => $answer,
+                'is_correct' => $isCorrect ? 1 : 0,
+                'verified' => true,
                 'verified_by' => auth()->id(),
                 'verified_at' => now(),
             ]);
         }
     }
 
+    /*
+     * ==========================================
+     * VALIDAR MULTIPLE
+     * ==========================================
+     */
+
+    $multipleQuestions = $participant->giveaway
+        ->questions()
+        ->where('type', 'multiple')
+        ->where(function ($query) {
+            $query->where('show_user', true)
+                ->orWhere('show_user', 1)
+                ->orWhere('show_user', '1');
+        })
+        ->get();
+
+    $allMultipleCorrect = true;
+
+    foreach ($multipleQuestions as $question) {
+
+        $response = $participant->responses()
+            ->where('question_id', $question->id)
+            ->first();
+
+        if (
+            !$response ||
+            (int) $response->is_correct !== 1
+        ) {
+            $allMultipleCorrect = false;
+            break;
+        }
+    }
+
+    /*
+     * ==========================================
+     * VALIDAR BOOLEAN
+     * ==========================================
+     */
+
+    $booleanQuestions = $participant->giveaway
+        ->questions()
+        ->where('type', 'boolean')
+        ->where(function ($query) {
+            $query->where('show_user', true)
+                ->orWhere('show_user', 1)
+                ->orWhere('show_user', '1');
+        })
+        ->get();
+
+    $allBooleanCorrect = true;
+
+    foreach ($booleanQuestions as $question) {
+
+        $response = $participant->responses()
+            ->where('question_id', $question->id)
+            ->first();
+
+        /*
+         * Debe existir respuesta y debe ser TRUE.
+         */
+        if (
+            !$response ||
+            (int) $response->is_correct !== 1
+        ) {
+            $allBooleanCorrect = false;
+            break;
+        }
+    }
+
+    /*
+     * ==========================================
+     * DETERMINAR PREMIO
+     * ==========================================
+     */
+
+    $allCorrect =
+        $allMultipleCorrect &&
+        $allBooleanCorrect;
+
+    $prizeType = $allCorrect
+        ? 'Premio principal'
+        : 'Consolación';
+
+    /*
+     * ==========================================
+     * GUARDAR PREMIO
+     * ==========================================
+     */
+
+    $participant->update([
+        'prize_type' => $prizeType,
+        'status' => 'validated',
+        'prize_delivered' => 1,
+    ]);
+
+    /*
+     * Recargar para devolver los valores
+     * realmente guardados.
+     */
+    $participant->refresh();
+
     return response()->json([
         'success' => true,
         'message' => 'La participación fue validada correctamente.',
+        'participant_id' => $participant->id,
+        'folio' => $participant->folio,
+        'prize_type' => $participant->prize_type,
+        'all_correct' => $allCorrect,
+        'all_multiple_correct' => $allMultipleCorrect,
+        'all_boolean_correct' => $allBooleanCorrect,
+        'status' => $participant->status,
+        'prize_delivered' => $participant->prize_delivered,
     ]);
 }
 
+
+public function participants($id)
+{
+    $giveaway = Giveaway::with('questions')->findOrFail($id);
+
+    $totalQuestions = $giveaway->questions->count();
+
+    $participants = Participant::where('giveaway_id', $giveaway->id)
+        ->with('responses.question')
+        ->orderByDesc('created_at')
+        ->get()
+        ->map(function ($participant) use ($totalQuestions) {
+
+            $responses = $participant->responses;
+
+            $answeredQuestions = $responses
+                ->filter(function ($response) {
+                    return $response->question !== null;
+                })
+                ->count();
+
+            $correctAnswers = $responses
+                ->where('is_correct', 1)
+                ->count();
+
+            return [
+                'id' => $participant->id,
+
+                'folio' => $participant->folio,
+
+                'instagram' => $participant->instagram,
+
+                'status' => $participant->status,
+
+                // Preguntas
+                'questions_answered' => $answeredQuestions,
+
+                'questions_total' => $totalQuestions,
+
+                'questions_result' =>
+                    $answeredQuestions . ' / ' . $totalQuestions,
+
+                // Correctas
+                'correct_answers' => $correctAnswers,
+
+                // Premio
+                'prize_type' => $participant->prize_type,
+
+                'prize_delivered' =>
+                    (bool) $participant->prize_delivered,
+
+                // Fecha
+                'created_at' => $participant->created_at,
+
+                'created_at_formatted' => $participant->created_at
+                    ? $participant->created_at->format('d/m/Y h:i A')
+                    : null,
+
+                // Respuestas
+                'responses' => $responses,
+            ];
+        });
+
+    return view(
+        'giveaways.participants',
+        compact(
+            'giveaway',
+            'participants'
+        )
+    );
+}
 
 
 }

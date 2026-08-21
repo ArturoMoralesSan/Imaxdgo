@@ -59,7 +59,7 @@
                     <input
                         type="text"
                         v-model="folio"
-                        placeholder="F5XSBEZ0"
+                        placeholder="F501"
                         autocomplete="off"
                         @keyup.enter="search"
                     >
